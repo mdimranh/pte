@@ -40,11 +40,6 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
-    'dj_rest_auth',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
 
     "phonenumber_field", # docs: https://django-phonenumber-field.readthedocs.io/en/latest/
 
@@ -62,17 +57,6 @@ REST_USE_JWT = True
 #         }
 #     }
 # }
-
-LOGIN_REDIRECT_URL = '/api/auth/google/login/callback/'
-
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': '727258059817-cje4kg6n3avnem6htkifdpunii8gaqp0.apps.googleusercontent.com',
-            'secret': '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'
-        }
-    }
-}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -114,7 +98,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'pte',
         'USER': 'postgres',
-        'PASSWORD': 'mdimranh',
+        'PASSWORD': 'postgres',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
@@ -130,11 +114,11 @@ AUTHENTICATION_BACKENDS = [
     # 'dj_rest_auth.authentication.AllAuthJWTAuthentication',
 ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-    )
-}
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': (
+#         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+#     )
+# }
 
 REST_AUTH = {
     'USE_JWT': True,
