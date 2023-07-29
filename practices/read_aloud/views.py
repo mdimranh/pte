@@ -5,6 +5,7 @@ from nltk.corpus import wordnet
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
 
 from .models import ReadAloud
@@ -22,7 +23,7 @@ class ReadAloudView(RetrieveAPIView):
     queryset = ReadAloud.objects.all()
 
 class ReadAloudCreateView(CreateAPIView):
-    # permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
     queryset = ReadAloud.objects.all()
     serializer_class = ReadAloudSerializer
 

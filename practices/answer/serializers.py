@@ -14,3 +14,8 @@ class AnswerListSerializer(serializers.ModelSerializer):
             "score",
             "scores"
         ]
+
+class AnswerCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answer
+        fields = ["read_aloud", "audio"]
