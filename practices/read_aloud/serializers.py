@@ -7,5 +7,5 @@ class ReadAloudSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReadAloud
         fields = [
-            "title", "article", "tested" 
+            "id", "title", "article", "tested" 
         ]
