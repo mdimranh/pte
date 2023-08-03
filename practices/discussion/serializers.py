@@ -19,13 +19,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 class DiscussionListSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-    like = UserSerializer(many=True)
+    # like = UserSerializer(many=True)
     # replies = DiscussionSerializer(many=True)
     class Meta:
         model = Discussion
         fields = [
             "total_like",
-            "like",
+            # "like",
             "user",
             "total_replies"
         ]

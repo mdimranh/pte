@@ -1,5 +1,6 @@
 from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Discussion
 from .serializers import DiscussionListSerializer, DiscussionSerializer
@@ -41,5 +42,7 @@ class DiscussionListView(ListAPIView):
     pagination_class = CustomPagination
 
 class DiscussionCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = DiscussionSerializer
-    queryset = Discussion.objects.all()
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

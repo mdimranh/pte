@@ -32,7 +32,6 @@ class ReadAloudListView(ListAPIView):
     serializer_class = ReadAloudSerializer
 
 
-
 def get_main_word(word):
     lemmatizer = WordNetLemmatizer()
     word_forms = word_tokenize(word)
