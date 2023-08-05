@@ -19,3 +19,21 @@ class AnswerCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
         fields = ["read_aloud", "audio"]
+
+
+class SummarizeAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answer
+        fields = [
+            "summarize",
+            "summarize_text"
+        ]
+
+class SummarizeAnswerListSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    class Meta:
+        model = Answer
+        fields = [
+            "user",
+            "scores"
+        ]
