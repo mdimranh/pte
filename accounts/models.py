@@ -40,7 +40,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone = PhoneNumberField(unique=True)
     first_name = models.CharField(max_length=255, blank=True)
     last_name = models.CharField(max_length=255, null=True)
-    picture = models.URLField(blank=True)
+    picture = models.ImageField(upload_to="user")
     date_joined = models.DateTimeField(_('date joined'), auto_now=True)
     is_active   = models.BooleanField(default=True)
     is_admin    = models.BooleanField(default=False)
@@ -59,10 +59,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     #     return "/users/%s/" % urlquote(self.email)
 
     def get_full_name(self):
-       return self.email
+        full_name = self.first_name + " " + self.last_name if self.first_name and self.last_name else self.email
+        return full_name
+    #    return self.email
 
     def get_short_name(self):
-        return self.email
+        short_name = self.first_name + " " + self.last_name if self.first_name and self.last_name else self.email
+        return short_name
 
     # def email_user(self, subject, message, from_email=None):
     #     send_mail(subject, message, from_email, [self.email])

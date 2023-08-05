@@ -4,7 +4,7 @@ from django.db import models
 
 class ReadAloud(models.Model):
     title = models.TextField()
-    article = models.TextField()
+    content = models.TextField()
     tested = models.IntegerField(default=0)
 
     def __str__(self):
