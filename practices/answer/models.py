@@ -13,7 +13,7 @@ class Answer(models.Model):
     read_aloud = models.ForeignKey(ReadAloud, blank=True, null=True, on_delete=models.CASCADE)
     summarize = models.ForeignKey(Summarize, blank=True, null=True, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    audio = models.FileField(blank=True, null=True, upload_to="answer/%Y/%m/%d/", validators=[FileExtensionValidator(['mp3'])])
+    audio = models.FileField(blank=True, null=True, upload_to="answer/%Y/%m/%d/", validators=[FileExtensionValidator(['mp3', 'wav'])])
     summarize_text = models.TextField(blank=True, null=True)
     score = models.JSONField(default=dict)
 
@@ -22,9 +22,13 @@ class Answer(models.Model):
         score = self.score
         if getattr(self, 'read_aloud', None) is not None:
             return {
-                "content": score['content_score'],
-                "pronunciation": score['pronunciation_score'],
-                "fluency": score['fluency_score']
+                'score': score['score'],
+                'content_score': score['content_score'],
+                'user_speech': score['user_speech'],
+                'reference_text': score['reference_text'],
+                'word_highlight': score['word_highlight'],
+                'fluency_score': score['fluency_score'],
+                'total_score': score['total_score']
             }
         if getattr(self, 'summarize', None) is not None:
             return {
