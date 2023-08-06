@@ -1,8 +1,15 @@
 from rest_framework.views import APIView
+from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+from .serializers import ReadAloudAnswerCreateSerializer
+from .models import ReadAloud
+from ..answer.models import Answer
+
+from django.core.files.storage import default_storage
 
 import base64, difflib, io, math, os, re, string, wave, Levenshtein, nltk, spacy, librosa
 import speech_recognition as sr
@@ -12,6 +19,9 @@ from transformers import pipeline
 from collections import Counter
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
+
+
+import uuid, os
 
 # nltk.download('punkt')
 
@@ -257,6 +267,12 @@ def read_aloud_and_evaluate(reference_text, audio_file_path):
     audio = AudioSegment.from_file(audio_file_path)
     audio.export(wav_file_path, format="wav")
     print(audio_file_path)
+
+    # imran ------->
+    # model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-base-960h")
+    # tokenizer = Wav2Vec2Tokenizer.from_pretrained("facebook/wav2vec2-base-960h")
+    # pipe = pipeline("automatic-speech-recognition", model=model, tokenizer=tokenizer)
+
     pipe = pipeline("automatic-speech-recognition", model="Wav2Vec2")
     # Transcribe the audio
     transcription = pipe(audio_file_path)
@@ -366,25 +382,25 @@ word_highlight = []
 class ReadAloudAnswerCreate(APIView):
 
     def post(self, request):
-        print(request.data)
-        global score, content_score, user_speech, reference_text, word_highlight, fluency_score,total_score
-        audio = request.data['audio']
+        global score, content_score, user_speech, reference_text, word_highlight, fluency_score, total_score
+        serializer = ReadAloudAnswerCreateSerializer(data=request.data)
+        if serializer.is_valid():
 
-        if audio:
+            data = serializer.validated_data
+
+            audio = request.data.get('audio')
             audio_folder = os.path.join(settings.BASE_DIR , 'audio')
             if not os.path.exists(audio_folder):
                 os.makedirs(audio_folder)
-            audio_path = os.path.join(audio_folder, audio.name)
-
-            # Read the audio content and save it to a file
+            unique_name = str(uuid.uuid4())+'.wav'
+            audio_path = os.path.join(audio_folder, unique_name)
             with open(audio_path, 'wb') as file:
                 file.write(audio.read())
-            reference_text = request.data.get('reference')
-            print(audio_path)
-            print(reference_text)
+
+            get_read_aloud = ReadAloud.objects.get(id = data['read_aloud'].id)
+            reference_text = get_read_aloud.content
             score, content_score, user_speech, word_highlight, fluency_score,total_score = read_aloud_and_evaluate(reference_text, audio_path)
-        return Response(
-            {
+            final_score = {
                 'score': score,
                 'content_score': content_score,
                 'user_speech': user_speech,
@@ -392,6 +408,51 @@ class ReadAloudAnswerCreate(APIView):
                 'word_highlight': word_highlight,
                 'fluency_score': fluency_score,
                 'total_score': total_score
-            },
-            starts = status.HTTP_200_OK
-        )
+            }
+            serializer.save(user=self.request.user, score=final_score)
+            if os.path.exists(audio_path):
+                os.remove(audio_path)
+            return Response(final_score, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+# import numpy as np
+# from scipy.io import wavfile
+# import uuid, os
+
+# class ReadAloudAnswerCreate(CreateAPIView):
+#     permission_classes = [IsAuthenticated]
+#     serializer_class = ReadAloudAnswerCreateSerializer
+#     def perform_create(self, serializer):
+#         data = serializer.validated_data
+#         # serialize = serializer.save(user=self.request.user)
+#         get_readaloud = ReadAloud.objects.get(id = data['read_aloud'].id)
+#         # get_answer = Answer.objects.get(id=serialize.id)
+#         reference_text = get_readaloud.content
+
+#         # Save the uploaded file to a temporary file on disk
+#         # (Alternatively, you can read the file directly without saving it to disk if needed.)
+#         temp_file_path = os.path.join() '/path/to/temporary/file.wav'
+#         with open(temp_file_path, 'wb') as temp_file:
+#             for chunk in data['audio'].chunks():
+#                 temp_file.write(chunk)
+
+#         # Read the WAV file and convert it into a NumPy ndarray
+#         sample_rate, audio_data = wavfile.read(temp_file_path)
+
+#         # At this point, you have the audio data in the 'audio_data' variable as a NumPy ndarray,
+#         # and 'sample_rate' contains the sample rate of the audio.
+
+
+#         score, content_score, user_speech, word_highlight, fluency_score, total_score = read_aloud_and_evaluate(reference_text, data['audio'])
+#         final_score = {
+#             'score': score,
+#             'content_score': content_score,
+#             'user_speech': user_speech,
+#             'reference_text': reference_text,
+#             'word_highlight': word_highlight,
+#             'fluency_score': fluency_score,
+#             'total_score': total_score
+#         }
+#         serialize = serializer.save(user=self.request.user, score=final_score)
+#         # get_answer.final_score = final_score
+#         # get_answer.save()
