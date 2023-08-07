@@ -7,6 +7,7 @@ from nltk.tokenize import word_tokenize
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
+from django.db.models import Q
 
 from .models import ReadAloud
 from .serializers import ReadAloudSerializer, ReadAloudAnswerListSerializer
@@ -32,6 +33,30 @@ class ReadAloudListView(ListAPIView):
     queryset = ReadAloud.objects.all()
     serializer_class = ReadAloudSerializer
 
+    def get_queryset(self):
+        query = self.request.query_params.get('query')
+        practiced = self.request.query_params.get('practiced') == 'true'
+        if query and practiced:
+            if query.isnumeric():
+                return ReadAloud.objects.filter(
+                    Q(title__icontains=query) | Q(id=query),
+                    answer__isnull=not practiced
+                )
+            else:
+                return ReadAloud.objects.filter(
+                    title__icontains=query,
+                    answer__isnull=not practiced
+                )
+        elif query:
+            if query.isnumeric():
+                return ReadAloud.objects.filter(
+                    Q(title__icontains=query) | Q(id=query)
+                )
+            else:
+                return ReadAloud.objects.filter(
+                    title__icontains=query
+                )
+        return self.queryset.all()
 
 def get_main_word(word):
     lemmatizer = WordNetLemmatizer()
