@@ -7,6 +7,9 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
+
 
 class CustomUserManager(BaseUserManager):
     def _create_user(self, email, phone, password, is_staff, is_superuser, **extra_fields):
@@ -38,8 +41,7 @@ class CustomUserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     phone = PhoneNumberField(unique=True)
-    first_name = models.CharField(max_length=255, blank=True)
-    last_name = models.CharField(max_length=255, null=True)
+    full_name = models.CharField(max_length=255, blank=True)
     picture = models.ImageField(upload_to="user")
     date_joined = models.DateTimeField(_('date joined'), auto_now=True)
     is_active   = models.BooleanField(default=True)
@@ -59,13 +61,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     #     return "/users/%s/" % urlquote(self.email)
 
     def get_full_name(self):
-        full_name = self.first_name + " " + self.last_name if self.first_name and self.last_name else self.email
-        return full_name
-    #    return self.email
+        return self.full_name
 
     def get_short_name(self):
-        short_name = self.first_name + " " + self.last_name if self.first_name and self.last_name else self.email
-        return short_name
+        return self.full_name
 
     # def email_user(self, subject, message, from_email=None):
     #     send_mail(subject, message, from_email, [self.email])
+
+@receiver(post_delete, sender=User)
+def delete_file(sender, instance, created, **kwargs):
+    if instance.picture:
+        instance.picture.delete(False)

@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth.models import Group
+from django.utils.html import format_html
 
 from .models import User
 
@@ -55,13 +56,21 @@ class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
 
+    def user_profile(self, obj):
+        if obj.picture and obj.picture.file:
+            return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover;" />'.format(obj.picture.url))
+        else:
+            return format_html('<img src=""/>')
+
+    user_profile.short_description = 'Image'
+
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ('email', 'phone', 'is_staff', 'is_active', 'last_login', 'date_joined')
+    list_display = ('full_name', 'user_profile', 'email', 'phone', 'is_staff', 'is_active', 'last_login', 'date_joined')
     list_filter = ('is_staff', 'is_active')
     fieldsets = (
-        (None, {'fields': ('first_name', 'last_name', 'email', 'phone', 'password', 'is_active', 'picture')}),
+        (None, {'fields': ('full_name', 'email', 'phone', 'password', 'is_active', 'picture')}),
         ('Permissions', {'fields': ('is_staff', 'groups', 'user_permissions')}),
     )
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
