@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-6q!66!dp%5$(cg3o^%#!1ek=_3t+(qjf&3e3i6vwmm6zk(w(d7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "3.108.252.181", "ip-172-31-10-105.ap-south-1.compute.internal"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "3.110.151.3", "ip-172-31-10-105.ap-south-1.compute.internal"]
 
 
 # Application definition
@@ -163,16 +163,16 @@ STATIC_URL = 'static/'
 
 
 # Storage configuration
-AWS_ACCESS_KEY_ID = 'AKIAQ2VTJQTMJ2ADEKE5 '
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'peters-pte'
-AWS_S3_SIGNATURE_NAME = 's3v4',
-AWS_S3_REGION_NAME = 'ap-south-1'
-AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL =  None
-AWS_QUERYSTRING_AUTH = False
-AWS_S3_VERITY = True
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# AWS_ACCESS_KEY_ID = 'AKIAQ2VTJQTMJ2ADEKE5 '
+# AWS_SECRET_ACCESS_KEY = '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'
+# AWS_STORAGE_BUCKET_NAME = 'peters-pte'
+# AWS_S3_SIGNATURE_NAME = 's3v4',
+# AWS_S3_REGION_NAME = 'ap-south-1'
+# AWS_S3_FILE_OVERWRITE = False
+# AWS_DEFAULT_ACL =  None
+# AWS_QUERYSTRING_AUTH = False
+# AWS_S3_VERITY = True
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

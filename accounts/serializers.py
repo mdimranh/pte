@@ -21,6 +21,14 @@ class UserCreateSerializer(serializers.ModelSerializer):
         model = User
         fields = ('email', "full_name", "phone",)
 
+class UserLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(max_length=255)
+    
+    class Meta:
+        model = User
+        fields = ('email', 'password')
+
 class UserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

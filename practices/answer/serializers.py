@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from ..discussion.serializers import UserSerializer
 from .models import Answer
+from ..summarize.models import Summarize
 
 
 class AnswerListSerializer(serializers.ModelSerializer):
@@ -22,6 +23,8 @@ class AnswerCreateSerializer(serializers.ModelSerializer):
 
 
 class SummarizeAnswerSerializer(serializers.ModelSerializer):
+    summarize = serializers.PrimaryKeyRelatedField(queryset=Summarize.objects.all())
+    summarize_text = serializers.CharField()
     class Meta:
         model = Answer
         fields = [

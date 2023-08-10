@@ -42,7 +42,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     phone = PhoneNumberField(unique=True)
     full_name = models.CharField(max_length=255, blank=True)
-    picture = models.ImageField(upload_to="user")
+    picture = models.ImageField(upload_to="media/user")
     date_joined = models.DateTimeField(_('date joined'), auto_now=True)
     is_active   = models.BooleanField(default=True)
     is_admin    = models.BooleanField(default=False)

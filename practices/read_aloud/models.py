@@ -9,6 +9,7 @@ class ReadAloud(models.Model):
     tested = models.IntegerField(default=0)
     bookmark = models.ManyToManyField(User, blank=True, related_name='bookmark')
     prediction = models.BooleanField(default=False)
+    appeared = models.IntegerField(default=0)
 
     def practiced(self):
         return self.answer_set.count()

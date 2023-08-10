@@ -401,13 +401,14 @@ class ReadAloudAnswerCreate(APIView):
             reference_text = get_read_aloud.content
             score, content_score, user_speech, word_highlight, fluency_score,total_score = read_aloud_and_evaluate(reference_text, audio_path)
             final_score = {
-                'score': score,
-                'content_score': content_score,
+                'pronunciation_score': score,
+                'reading_score': content_score,
                 'user_speech': user_speech,
                 'reference_text': reference_text,
                 'word_highlight': word_highlight,
                 'fluency_score': fluency_score,
-                'total_score': total_score
+                'total_score': total_score,
+                'speaking_score': (fluency_score + score) / 2
             }
             serializer.save(user=self.request.user, score=final_score)
             if os.path.exists(audio_path):

@@ -50,11 +50,11 @@ def score_summary(summary, reference):
 
         # Return individual scores and overall score
         scores = {
-            'Content': content_score * 100,
-            'Form': form_score,
-            'Grammar': grammar_score,
-            'Vocabulary': vocabulary_score,
-            'Overall': overall_score * 100
+            'Content': round(content_score * 100, 2),
+            'Form': round(form_score, 2),
+            'Grammar': round(grammar_score, 2),
+            'Vocabulary': round(vocabulary_score, 2),
+            'Overall': round(overall_score * 100, 2)
         }
 
     return scores
@@ -96,11 +96,14 @@ def calculate_vocabulary_score(summary):
     vocabulary_score = min(2, vocabulary_score)  # Cap the score at 2
     return vocabulary_score
 
-class SummarizeAnswerCreateView(CreateAPIView):
+class SummarizeAnswerCreateView(APIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = SummarizeAnswerSerializer
-    def perform_create(self, serializer):
-        data = serializer.validated_data
-        get_summarize = Summarize.objects.get(id = data['summarize'].id)
-        score = score_summary(get_summarize.content, self.request.data.get("summarize_text"))
-        serializer.save(user=self.request.user, score=score)
+    def post(self, request):
+        serializer = SummarizeAnswerSerializer(data=request.data)
+        if serializer.is_valid():
+            # get_summarize = Summarize.objects.filter(id = serializer.validated_data['summarize'].id).first()
+            score = score_summary(serializer.validated_data['summarize'].content, self.request.data.get("summarize_text"))
+            serializer.save(user=self.request.user, score=score)
+            return Response(score)
+        else:
+            return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)

@@ -10,7 +10,7 @@ class ReadAloudSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReadAloud
         fields = [
-            "id", "title", "content", "practiced", "self_bookmark"
+            "id", "title", "content", "practiced", "self_bookmark", "prediction", "appeared"
         ]
 
     def get_self_bookmark(self, obj):
