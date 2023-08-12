@@ -5,7 +5,7 @@ from nltk.corpus import wordnet
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.views import APIView
 from django.db.models import Q
 
@@ -130,5 +130,17 @@ class SummarizeAnswerListView(ListAPIView):
 
         # Filter the Answer objects based on the 'summarize' field with the given 'pk'
         queryset = Answer.objects.filter(read_aloud=pk)
+
+        return queryset
+
+class MyAnswerListView(ListAPIView):
+    serializer_class = ReadAloudAnswerListSerializer
+    permission_classes = (IsAuthenticated,)
+    def get_queryset(self):
+        # Get the primary key (pk) from the URL query parameters
+        pk = self.kwargs.get('pk')
+
+        # Filter the Answer objects based on the 'summarize' field with the given 'pk'
+        queryset = Answer.objects.filter(read_aloud=pk, user=self.request.user)
 
         return queryset

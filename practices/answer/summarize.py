@@ -26,11 +26,11 @@ def score_summary(summary, reference):
 
         # Return individual scores and overall score
         scores = {
-            'Content': content_score,
-            'Form': None,
-            'Grammar': None,
-            'Vocabulary': None,
-            'Overall': content_score
+            'Content': round(content_score, 2),
+            'Form': 0,
+            'Grammar': 0,
+            'Vocabulary': 0,
+            'Overall': round(content_score, 2)
         }
     else:
         # If there is only one sentence, calculate scores for all factors
@@ -50,11 +50,11 @@ def score_summary(summary, reference):
 
         # Return individual scores and overall score
         scores = {
-            'Content': round(content_score * 100, 2),
+            'Content': round(content_score, 2),
             'Form': round(form_score, 2),
             'Grammar': round(grammar_score, 2),
             'Vocabulary': round(vocabulary_score, 2),
-            'Overall': round(overall_score * 100, 2)
+            'Overall': round(overall_score, 2)
         }
 
     return scores
@@ -77,8 +77,16 @@ def calculate_form_score(summary):
     # Evaluate the form and structure of the summary
     # Score based on the length of the summary
     summary_length = len(word_tokenize(summary))
-    form_score = 1 if summary_length >= 50 and summary_length <= 74 else 0
+    if summary_length >= 5 and summary_length <= 74:
+        form_score = 1
+    # elif summary_length < 50 and summary_length > 5:
+    #     # Calculate partial marks based on proximity to 50
+    #     form_score = summary_length / 50
+    else:
+        form_score = 0
+
     return form_score
+
 
 def calculate_grammar_score(summary):
     # Check the grammar and language quality of the summary
