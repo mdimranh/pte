@@ -462,15 +462,16 @@ class ReadAloudAnswerCreate(APIView):
             get_read_aloud = ReadAloud.objects.get(id = data['read_aloud'].id)
             reference_text = get_read_aloud.content
             score, content_score, user_speech, word_highlight, fluency_score,total_score = read_aloud_and_evaluate(reference_text, audio_path)
+            speaking_score = (fluency_score + score) / 2
             final_score = {
-                'pronunciation_score': round(score, 2),
-                'reading_score': round(content_score, 2),
-                'user_speech': round(user_speech, 2),
-                'reference_text': round(reference_text, 2),
-                'word_highlight': round(word_highlight, 2),
-                'fluency_score': round(fluency_score, 2),
-                'total_score': round(total_score, 2),
-                'speaking_score': round((fluency_score + score) / 2, 2)
+                'pronunciation_score': round(score, 2) if score > 10 else 10,
+                'reading_score': round(content_score, 2) if content_score > 10 else 10,
+                'user_speech': user_speech,
+                'reference_text': reference_text,
+                'word_highlight': word_highlight,
+                'fluency_score': round(fluency_score, 2) if fluency_score > 10 else 10,
+                'total_score': round(total_score, 2) if total_score > 10 else 10,
+                'speaking_score': round(speaking_score, 2) if speaking_score > 10 else 10
             }
             serializer.save(user=self.request.user, score=final_score)
             if os.path.exists(audio_path):
