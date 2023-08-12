@@ -5,7 +5,7 @@ class Summarize(models.Model):
     title = models.TextField()
     content = models.TextField()
     tested = models.IntegerField(default=0)
-    bookmark = models.ManyToManyField(User, blank=True, related_name='bookmark')
+    bookmark = models.ManyToManyField(User, blank=True, related_name='summarize_bookmark')
     prediction = models.BooleanField(default=False)
     appeared = models.IntegerField(default=0)
 
