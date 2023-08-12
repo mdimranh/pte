@@ -29,8 +29,15 @@ recognizer = sr.Recognizer()
 
 # spacy.cli.download("en_core_web_sm")
 nlp = spacy.load('en_core_web_sm')
-
 def evaluate_pronunciation(reference_text, user_speech):
+    # reference = reference.lower()
+    # reference = reference.translate(str.maketrans("", "", string.punctuation))
+
+    # user_speech = user_speech.lower()
+    # user_speech = user_speech.translate(str.maketrans("", "", string.punctuation))
+
+    # reference_words = reference.split()
+    # user_words = user_speech.split()
     reference_text_clean = re.sub(r'[^\w\s]', '', reference_text.lower())
     user_speech_clean = re.sub(r'[^\w\s]', '', user_speech.lower())
 
@@ -41,6 +48,40 @@ def evaluate_pronunciation(reference_text, user_speech):
     pronunciation_score = 1 - wer
 
     return pronunciation_score * 90
+# Create the pipeline for audio classification (pronunciation scoring).
+    # pipe = pipeline("audio-classification", model="hafidikhsan/Wav2vec2-large-robust-Pronounciation-Evaluation")
+    # audio_file_path = "alfa_slow.wav"
+    # pronunciation_scores = pipe(audio_file_path)
+    # proficient_score = next(item['score'] for item in pronunciation_scores if item['label'] == 'proficient')
+    # score_times_90 = proficient_score * 90
+    # return score_times_90
+    # reference_text_clean = re.sub(r'[^\w\s]', '', reference_text.lower())
+    # user_speech_clean = re.sub(r'[^\w\s]', '', user_speech.lower())
+
+    # reference_words = reference_text_clean.split()
+    # user_speech_words = user_speech_clean.split()
+
+    # # Calculate the Levenshtein distance between the two texts
+    # distance = Levenshtein.distance(" ".join(reference_words), " ".join(user_speech_words))
+
+    # # Calculate the total number of words in the reference text
+    # total_words = len(reference_words)
+
+    # # Calculate the number of correct words
+    # correct_words = total_words - distance
+
+    # # Calculate the percentage of correct words
+    # percentage_correct = (correct_words / total_words) * 100
+
+    # # Scale the percentage to a score out of 90
+    # score_out_of_90 = (percentage_correct / 100) * 90
+
+    # return score_out_of_90
+import spacy
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+import librosa
+
 
 def word_similarity(word1, word2):
     doc1 = nlp(word1)
@@ -189,14 +230,18 @@ def get_audio_duration(audio_path):
 
 def calculate_speech_rate(audio_path):
     # Load the audio file
-    r = sr.Recognizer()
-    with sr.AudioFile(audio_path) as source:
-        audio = r.record(source)
+    # r = sr.Recognizer()
+    # with sr.AudioFile(audio_path) as source:
+    #     audio = r.record(source)
 
-    # Perform speech recognition to transcribe the audio
-    transcription = r.recognize_google(audio)
+    # # Perform speech recognition to transcribe the audio
+    # transcription = r.recognize_google(audio)
 
     # Count the number of words
+    pipe = pipeline("automatic-speech-recognition", model="Wav2Vec2")
+    # Transcribe the audio
+    transcriptions = pipe(audio_path)
+    transcription= transcriptions['text']
     words = transcription.split()
     num_words = len(words)
 
@@ -211,6 +256,7 @@ def calculate_speech_rate(audio_path):
 
     return speech_rate
 
+import librosa
 
 def calculate_speech_rate_score(speech_rate):
     ideal_wps_min = 2.24
@@ -261,18 +307,33 @@ def get_sampling_rate(audio_path):
     audio, sr = librosa.load(audio_path, sr=None)
     return sr
 
+# def count_pauses(audio_path, frame_duration=0.2, energy_threshold=0.05):
+#     audio, sr = librosa.load(audio_path, sr=None, mono=True)  # Set mono=True to ensure a 1-dimensional audio signal
+
+#     frame_size = int(sr * frame_duration)
+#     hop_length = frame_size // 2
+#     energy = librosa.feature.rms(y=audio, frame_length=frame_size, hop_length=hop_length)[0]
+
+#     pauses = 0
+#     is_pause = False
+#     for e in energy:
+#         if e < energy_threshold:
+#             if not is_pause:
+#                 pauses += 1
+#                 is_pause = True
+#         else:
+#             is_pause = False
+#     print(pauses)
+#     return pauses
+
+
+
 def read_aloud_and_evaluate(reference_text, audio_file_path):
     # Convert audio file to WAV format
     wav_file_path = "converted_audio.wav"
     audio = AudioSegment.from_file(audio_file_path)
     audio.export(wav_file_path, format="wav")
     print(audio_file_path)
-
-    # imran ------->
-    # model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-base-960h")
-    # tokenizer = Wav2Vec2Tokenizer.from_pretrained("facebook/wav2vec2-base-960h")
-    # pipe = pipeline("automatic-speech-recognition", model=model, tokenizer=tokenizer)
-
     pipe = pipeline("automatic-speech-recognition", model="Wav2Vec2")
     # Transcribe the audio
     transcription = pipe(audio_file_path)
@@ -364,6 +425,7 @@ def read_aloud_and_evaluate(reference_text, audio_file_path):
     content_score = evaluate_content(reference_text, user_speech)
     content_score = round(content_score, 2)
     fluency_score = evaluate_fluency(wav_file_path, speech)
+    # fluency_score = evaluate_fluency(wav_file_path, speech)
     total_score= (score+content_score+fluency_score) / 3 
     total_score = round(total_score, 2)
     print("Pronunciation score:", score)
@@ -401,14 +463,14 @@ class ReadAloudAnswerCreate(APIView):
             reference_text = get_read_aloud.content
             score, content_score, user_speech, word_highlight, fluency_score,total_score = read_aloud_and_evaluate(reference_text, audio_path)
             final_score = {
-                'pronunciation_score': score,
-                'reading_score': content_score,
-                'user_speech': user_speech,
-                'reference_text': reference_text,
-                'word_highlight': word_highlight,
-                'fluency_score': fluency_score,
-                'total_score': total_score,
-                'speaking_score': (fluency_score + score) / 2
+                'pronunciation_score': round(score, 2),
+                'reading_score': round(content_score, 2),
+                'user_speech': round(user_speech, 2),
+                'reference_text': round(reference_text, 2),
+                'word_highlight': round(word_highlight, 2),
+                'fluency_score': round(fluency_score, 2),
+                'total_score': round(total_score, 2),
+                'speaking_score': round((fluency_score + score) / 2, 2)
             }
             serializer.save(user=self.request.user, score=final_score)
             if os.path.exists(audio_path):
