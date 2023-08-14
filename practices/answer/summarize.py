@@ -11,10 +11,8 @@ from ..answer.models import Answer
 from ..summarize.models import Summarize
 from .serializers import SummarizeAnswerSerializer
 
-# Load necessary models and resources
-# spacy.cli.download("en_core_web_sm")
 nlp = spacy.load('en_core_web_sm')
-# nltk.download('punkt')
+nltk.download('punkt')
 
 def score_summary(summary, reference):
     # Split the summary into sentences
