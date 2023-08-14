@@ -1,15 +1,15 @@
-from rest_framework.views import APIView
-from rest_framework.generics import CreateAPIView
-from .serializers import SummarizeAnswerSerializer
-from ..summarize.models import Summarize
-from ..answer.models import Answer
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-
 import nltk
 import spacy
 from nltk.tokenize import word_tokenize
+from rest_framework import status
+from rest_framework.generics import CreateAPIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from ..answer.models import Answer
+from ..summarize.models import Summarize
+from .serializers import SummarizeAnswerSerializer
 
 # Load necessary models and resources
 # spacy.cli.download("en_core_web_sm")
