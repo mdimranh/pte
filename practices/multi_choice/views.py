@@ -34,9 +34,9 @@ class MultiChoiceAnswerCreateView(APIView):
         base_score = len(correct_answers)
         for selected_answer in selected_answers:
             if selected_answer in correct_answers:
-                score += 1 / base_score
+                score += 1
             else:
-                score -= incorrect_penalty / base_score
+                score -= incorrect_penalty
 
         return max(score, 0)
         
