@@ -7,4 +7,5 @@ urlpatterns = [
     # path('', include('practices.summarize.urls')),
     path('', include('practices.highlight_summary.urls')),
     path('', include('practices.multi_choice.urls')),
+    path('', include('practices.missing_word.urls')),
 ]
