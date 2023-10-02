@@ -16,6 +16,7 @@ class MultiChoice(models.Model):
     right_options = ArrayField(models.TextField(), size=5)
     bookmark = models.ManyToManyField(User, blank=True, related_name='mc_bookmark')
     prediction = models.BooleanField(default=False)
+    single = models.BooleanField(default=False)
     appeared = models.IntegerField(default=0)
 
     def practiced(self):

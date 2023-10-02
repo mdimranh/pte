@@ -2,6 +2,8 @@ from django.shortcuts import render
 from rest_framework.generics import (CreateAPIView, ListAPIView,
                                      ListCreateAPIView, RetrieveAPIView)
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from ..discussion.views import CustomPagination
 from .models import HighlightSummary
@@ -24,15 +26,21 @@ class HighlightSummaryDetailsView(RetrieveAPIView):
     serializer_class = HighlightSummaryDetailsSerializer
     queryset = HighlightSummary.objects.all()
 
-class HighlightSummaryAnswerCreateView(CreateAPIView):
+class HighlightSummaryAnswerCreateView(APIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = HighlightSummaryAnswerCreateSerializer
 
-    def perform_create(self, serializer):
+    def post(self, request):
+        serializer = HighlightSummaryAnswerCreateSerializer(data=request.data)
         if serializer.is_valid():
             highlight_summary = serializer.validated_data.get("highlight_summary")
             score = 1 if highlight_summary.right_option == serializer.validated_data.get("answer") else 0
             serializer.save(user=self.request.user, score=score)
+            return Response({
+                "score": score,
+                "right_option": highlight_summary.right_option
+            })
+        else:
+            return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 class HighlightSummaryAnswerListView(ListAPIView):
     serializer_class = HighlightSummaryAnswerListSerializer
