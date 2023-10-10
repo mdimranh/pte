@@ -14,7 +14,8 @@ SECRET_KEY = 'django-insecure-6q!66!dp%5$(cg3o^%#!1ek=_3t+(qjf&3e3i6vwmm6zk(w(d7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "3.110.151.3", "ip-172-31-10-105.ap-south-1.compute.internal"]
+ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = ['https://api.codebyamirus.link']
 
 
 # Application definition

@@ -86,3 +86,9 @@ class UserProfileUpload(APIView):
             return Response({
                 'error': 'No picture provided'
             }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+class Home(APIView):
+    def get(self, request):
+        return Response({
+            "status": "Success"
+        })
