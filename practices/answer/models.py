@@ -6,6 +6,7 @@ from django.dispatch import receiver
 
 from accounts.models import User
 
+from ..dictation.models import Dictation
 from ..highlight_summary.models import HighlightSummary
 from ..missing_word.models import MissingWord
 from ..multi_choice.models import MultiChoice
@@ -19,6 +20,7 @@ class Answer(models.Model):
     highlight_summary = models.ForeignKey(HighlightSummary, blank=True, null=True, on_delete=models.CASCADE)
     multi_choice = models.ForeignKey(MultiChoice, blank=True, null=True, on_delete=models.CASCADE)
     missing_word = models.ForeignKey(MissingWord, blank=True, null=True, on_delete=models.CASCADE)
+    dictation = models.ForeignKey(Dictation, blank=True, null=True, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     audio = models.FileField(blank=True, null=True, upload_to="media/answer/%Y/%m/%d/", validators=[FileExtensionValidator(['wav'])])
     summarize_text = models.TextField(blank=True, null=True)
@@ -37,6 +39,11 @@ class Answer(models.Model):
         if getattr(self, 'highlight_summary', None) is not None:
             return score
         else: return {}
+
+    # def answer_details(self):
+    #     if getattr(self, 'dictation', None) is not None:
+    #         get_dictation = Dictation.objects.get(**getattr(self, 'dictation'))
+    #         return get_score(get_dictation.content, self.answer)
 
 @receiver(post_delete, sender=Answer)
 def delete_file(sender, instance, **kwargs):
