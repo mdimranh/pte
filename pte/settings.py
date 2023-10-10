@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'practices.highlight_summary',
     'practices.multi_choice',
     'practices.missing_word',
+    'practices.dictation',
 
     'corsheaders',
 
