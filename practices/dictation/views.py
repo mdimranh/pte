@@ -67,6 +67,7 @@ class DictationAnswerCreateView(APIView):
             return Response({
                 "score": score.get('score'),
                 "detail_answer": score.get('words'),
+                "max_score": len(serializer.validated_data['dictation'].content.split(" "))
             })
         else:
             return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)

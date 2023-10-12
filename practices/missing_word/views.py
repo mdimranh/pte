@@ -52,7 +52,8 @@ class MissingWordAnswerCreateView(APIView):
             return Response({
                 "score": score,
                 "right_options": serializer.validated_data['missing_word'].right_options,
-                "wrong_answers": [answer for answer in serializer.validated_data['answers'] if answer not in serializer.validated_data['missing_word'].right_options]
+                "wrong_answers": [answer for answer in serializer.validated_data['answers'] if answer not in serializer.validated_data['missing_word'].right_options],
+                "max_score": len(serializer.validated_data['missing_word'].right_options)
             })
         else:
             return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)

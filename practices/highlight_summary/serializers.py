@@ -52,5 +52,7 @@ class HighlightSummaryAnswerListSerializer(serializers.ModelSerializer):
         model = Answer
         fields = [
             "user",
-            "score"
+            "score",
+            "max_score",
+            "created_at"
         ]

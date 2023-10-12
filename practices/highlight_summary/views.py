@@ -37,7 +37,8 @@ class HighlightSummaryAnswerCreateView(APIView):
             serializer.save(user=self.request.user, score=score)
             return Response({
                 "score": score,
-                "right_option": highlight_summary.right_option
+                "right_option": highlight_summary.right_option,
+                "max_score": 1
             })
         else:
             return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)

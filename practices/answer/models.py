@@ -40,6 +40,17 @@ class Answer(models.Model):
             return score
         else: return {}
 
+    def max_score(self):
+        if getattr(self, 'multi_choice', None) is not None:
+            return len(self.multi_choice.right_options)
+        elif getattr(self, 'missing_word', None) is not None:
+            return len(self.missing_word.right_options)
+        elif getattr(self, 'dictation', None) is not None:
+            return len(self.dictation.content.split(" "))
+        elif getattr(self, 'highlight_summary', None) is not None:
+            return 1
+        return 0
+
     # def answer_details(self):
     #     if getattr(self, 'dictation', None) is not None:
     #         get_dictation = Dictation.objects.get(**getattr(self, 'dictation'))
