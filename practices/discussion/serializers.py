@@ -25,6 +25,7 @@ class ReplySerializer(serializers.ModelSerializer):
         model = Discussion
         fields = [
             'body',
+            "images",
             'self_like',
             "like",
             "user",
@@ -48,6 +49,7 @@ class DiscussionListSerializer(serializers.ModelSerializer):
             # "total_like",
             "self_like",
             'body',
+            "images",
             "like",
             "user",
             "replies",

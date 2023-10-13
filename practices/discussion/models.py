@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 
 from accounts.models import User
 
@@ -20,6 +21,7 @@ class Discussion(models.Model):
     # answer = models.ForeignKey(Answer, blank=True, null=True, on_delete=models.CASCADE)
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name="discussion")
     body = models.TextField()
+    images = ArrayField(models.ImageField(upload_to="media/discussion"), blank=True, null=True)
     like = models.ManyToManyField(User, related_name="like", blank=True)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='replies')
     created_at = models.DateTimeField(auto_now_add=True)
