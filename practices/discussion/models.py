@@ -9,6 +9,11 @@ from ..multi_choice.models import MultiChoice
 from ..missing_word.models import MissingWord
 from ..dictation.models import Dictation
 
+TYPES = [
+    ("discuss", "Discuss"),
+    ("new_question", "New Question"),
+    ("new_error", "New Error")
+]
 
 class Discussion(models.Model):
     read_aloud = models.ForeignKey(ReadAloud, blank=True, null=True, on_delete=models.CASCADE)
@@ -20,6 +25,7 @@ class Discussion(models.Model):
     # answer = models.ForeignKey(Answer, blank=True, null=True, on_delete=models.CASCADE)
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name="discussion")
     body = models.TextField()
+    type = models.CharField(max_length=30, choices=TYPES, default='discuss')
     like = models.ManyToManyField(User, related_name="like", blank=True)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='replies')
     created_at = models.DateTimeField(auto_now_add=True)

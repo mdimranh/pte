@@ -12,7 +12,7 @@ from .serializers import *
 
 
 class MultiChoiceListAPIView(ListAPIView):
-    queryset = MultiChoice.objects.all()
+    queryset = MultiChoice.objects.filter(single=False)
     serializer_class = MultiChoiceListSerializer
     pagination_class = CustomPagination
 
