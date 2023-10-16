@@ -12,7 +12,7 @@ from .serializers import *
 
 
 class MultiChoiceListAPIView(ListAPIView):
-    queryset = MultiChoice.objects.all()
+    queryset = MultiChoice.objects.filter(single=False)
     serializer_class = MultiChoiceListSerializer
     pagination_class = CustomPagination
 
@@ -58,7 +58,8 @@ class MultiChoiceAnswerCreateView(APIView):
                 # "score": round(score * len(serializer.validated_data['multi_choice'].options), 2),
                 "score": score,
                 "right_options": serializer.validated_data['multi_choice'].right_options,
-                "wrong_answers": [answer for answer in serializer.validated_data['answers'] if answer not in serializer.validated_data['multi_choice'].right_options]
+                "wrong_answers": [answer for answer in serializer.validated_data['answers'] if answer not in serializer.validated_data['multi_choice'].right_options],
+                "max_score": len(serializer.validated_data['multi_choice'].right_options)
             })
         else:
             return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)

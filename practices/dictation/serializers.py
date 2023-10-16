@@ -42,5 +42,6 @@ class DictationAnswerListSerializer(serializers.ModelSerializer):
         fields = [
             "user",
             "score",
+            "max_score",
             "created_at"
         ]

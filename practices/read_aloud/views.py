@@ -13,9 +13,9 @@ from .models import ReadAloud
 from .serializers import ReadAloudSerializer, ReadAloudAnswerListSerializer
 from ..answer.models import Answer
 
-nltk.download("wordnet")
-nltk.download("punkt")
-nltk.download('averaged_perceptron_tagger')
+# nltk.download("wordnet")
+# nltk.download("punkt")
+# nltk.download('averaged_perceptron_tagger')
 
 
 

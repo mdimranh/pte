@@ -34,5 +34,5 @@ class ReadAloudAnswerListSerializer(serializers.ModelSerializer):
         model = Answer
         fields = [
             "user",
-            "scores" 
+            "scores"
         ]
