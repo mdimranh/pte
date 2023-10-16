@@ -47,8 +47,73 @@ class CustomPagination(PageNumberPagination):
             "results": data
         })
 
-class DiscussionListView(ListAPIView):
+class ReadAloudDiscussionListView(ListAPIView):
     lookup_field = 'read_aloud'
+    serializer_class = DiscussionListSerializer
+    queryset = Discussion.objects.filter(parent__isnull=True)
+    pagination_class = CustomPagination
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
+class HighlightSummaryDiscussionListView(ListAPIView):
+    lookup_field = 'highlight_summary'
+    serializer_class = DiscussionListSerializer
+    queryset = Discussion.objects.filter(parent__isnull=True)
+    pagination_class = CustomPagination
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
+class SummarizeDiscussionListView(ListAPIView):
+    lookup_field = 'summarize'
+    serializer_class = DiscussionListSerializer
+    queryset = Discussion.objects.filter(parent__isnull=True)
+    pagination_class = CustomPagination
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
+class MultiChoiceDiscussionListView(ListAPIView):
+    lookup_field = 'multi_choice'
+    serializer_class = DiscussionListSerializer
+    queryset = Discussion.objects.filter(parent__isnull=True)
+    pagination_class = CustomPagination
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
+class MissingWordDiscussionListView(ListAPIView):
+    lookup_field = 'missing_word'
+    serializer_class = DiscussionListSerializer
+    queryset = Discussion.objects.filter(parent__isnull=True)
+    pagination_class = CustomPagination
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
+class DictationDiscussionListView(ListAPIView):
+    lookup_field = 'dictation'
     serializer_class = DiscussionListSerializer
     queryset = Discussion.objects.filter(parent__isnull=True)
     pagination_class = CustomPagination
@@ -79,7 +144,7 @@ class DiscussionAdd(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request, *args, **kwargs):
         model = self.kwargs.get('model')
-        fields = ['body']
+        fields = ['body', 'images']
         _for = _models.get(model)
         if _for is None:
             raise Http404
@@ -111,8 +176,19 @@ class LikeDiscussion(APIView):
                 "message": "Successfully liked."
             })
 
-class DiscussionDestryView(DestroyAPIView):
-    lookup_field = 'id'
+class DiscussionDelete(APIView):
     permission_classes = [IsAuthenticated]
-    queryset = Discussion.objects.all()
-    serializer_class = DiscussionSerializer
+    def delete(self, request, id):
+        discussion = Discussion.objects.filter(id=id).first()
+        if discussion is None:
+            return Response({
+                "error": "Discussion not found."
+            }, status = status.HTTP_404_NOT_FOUND)
+        if discussion.user != request.user:
+            return Response({
+                "error": "You dont have permission to delete this."
+            }, status = status.HTTP_401_UNAUTHORIZED)
+        discussion.delete()
+        return Response({
+            "message": "Discussion deleted successfully."
+        })
