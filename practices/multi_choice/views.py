@@ -2,10 +2,10 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.generics import (CreateAPIView, ListAPIView,
                                      ListCreateAPIView, RetrieveAPIView)
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from accounts.security.permission import IsStudentPermission
 from ..discussion.views import CustomPagination
 from .models import MultiChoice
 from .serializers import *
@@ -22,6 +22,7 @@ class MultiChoiceSingleanswerListAPIView(ListAPIView):
     pagination_class = CustomPagination
 
 class MultiChoiceCreateAPIView(CreateAPIView):
+    permission_classes = [IsAdminUser]
     queryset = MultiChoice.objects.all()
     serializer_class = MultiChoiceSerializer
     pagination_class = CustomPagination
@@ -33,7 +34,7 @@ class MultiChoiceDetailsView(RetrieveAPIView):
     queryset = MultiChoice.objects.all()
 
 class MultiChoiceAnswerCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsStudentPermission]
 
     def calculate_score(self, correct_answers, selected_answers, incorrect_penalty=1):
         score = 0
@@ -74,7 +75,7 @@ class MultiChoiceAnswerListView(ListAPIView):
 
 class MyAnswerListView(ListAPIView):
     serializer_class = MultiChoiceAnswerListSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsStudentPermission,)
     def get_queryset(self):
         # Get the primary key (pk) from the URL query parameters
         pk = self.kwargs.get('pk')

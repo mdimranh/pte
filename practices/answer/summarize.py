@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from ..answer.models import Answer
 from ..summarize.models import Summarize
 from .serializers import SummarizeAnswerSerializer
+from accounts.security.permission import IsStudentPermission
 
 # nlp = spacy.load('en_core_web_sm')
 # nltk.download('punkt')
@@ -103,7 +104,7 @@ def calculate_vocabulary_score(summary):
     return vocabulary_score
 
 class SummarizeAnswerCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsStudentPermission]
     def post(self, request):
         serializer = SummarizeAnswerSerializer(data=request.data)
         if serializer.is_valid():

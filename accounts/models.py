@@ -12,7 +12,7 @@ from django.dispatch import receiver
 
 
 class CustomUserManager(BaseUserManager):
-    def _create_user(self, email, phone, password, is_staff, is_superuser, **extra_fields):
+    def _create_user(self, email, phone, password, is_student, is_staff, is_superuser, **extra_fields):
         now = timezone.now()
 
         if not email:
@@ -22,7 +22,9 @@ class CustomUserManager(BaseUserManager):
         user = self.model(
                 email=email,
                 phone=phone,
-                is_staff=is_staff, is_active=True,
+                is_student=is_student,
+                is_staff=is_staff,
+                is_active=True,
                 is_superuser=is_superuser,
                 last_login=now,
                 date_joined=now,
@@ -33,10 +35,10 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_user(self, email, phone=None, password=None, **extra_fields):
-        return self._create_user(email, phone, password, False, False, **extra_fields)
+        return self._create_user(email, phone, password, False, False, False, **extra_fields)
 
     def create_superuser(self, email, phone, password, **extra_fields):
-        return self._create_user(email, phone, password, True, True, **extra_fields)
+        return self._create_user(email, phone, password, False, True, True, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
@@ -44,6 +46,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     full_name = models.CharField(max_length=255, blank=True)
     picture = models.ImageField(upload_to="media/user")
     date_joined = models.DateTimeField(_('date joined'), auto_now=True)
+    is_student   = models.BooleanField(default=False)
     is_active   = models.BooleanField(default=True)
     is_admin    = models.BooleanField(default=False)
     is_staff    = models.BooleanField(default=False)
