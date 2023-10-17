@@ -1,21 +1,24 @@
-from rest_framework.generics import CreateAPIView, ListAPIView, DestroyAPIView
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
 from django.http import Http404
+from rest_framework import status
+from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from .models import Discussion
-from ..read_aloud.models import ReadAloud
-from ..highlight_summary.models import HighlightSummary
-from ..summarize.models import Summarize
-from ..multi_choice.models import MultiChoice
-from ..missing_word.models import MissingWord
+from accounts.security.permission import (IsStudentPermission,
+                                          IsStudentPermissionOrReadonly)
+
 from ..dictation.models import Dictation
-from .serializers import DiscussionListSerializer, DiscussionSerializer, DynamicSerializer
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from accounts.security.permission import IsStudentPermission, IsStudentPermissionOrReadonly
+from ..highlight_summary.models import HighlightSummary
+from ..missing_word.models import MissingWord
+from ..multi_choice.models import MultiChoice
+from ..read_aloud.models import ReadAloud
+from ..summarize.models import Summarize
+from .models import Discussion
+from .serializers import (DiscussionListSerializer, DiscussionSerializer,
+                          DynamicSerializer)
 
 ds = DynamicSerializer(Discussion)
 
@@ -151,7 +154,7 @@ class DiscussionAdd(APIView):
     permission_classes = [IsStudentPermission]
     def post(self, request, *args, **kwargs):
         model = self.kwargs.get('model')
-        fields = ['body', 'images']
+        fields = ['body', 'images', 'parent']
         _for = _models.get(model)
         if _for is None:
             raise Http404

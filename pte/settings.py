@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'practices.missing_word',
     'practices.dictation',
 
+    'management',
+
     'corsheaders',
 
     'rest_framework',

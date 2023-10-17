@@ -1,14 +1,14 @@
-from django.db import models
 from django.contrib.postgres.fields import ArrayField
+from django.db import models
 
 from accounts.models import User
 
-from ..read_aloud.models import ReadAloud
-from ..highlight_summary.models import HighlightSummary
-from ..summarize.models import Summarize
-from ..multi_choice.models import MultiChoice
-from ..missing_word.models import MissingWord
 from ..dictation.models import Dictation
+from ..highlight_summary.models import HighlightSummary
+from ..missing_word.models import MissingWord
+from ..multi_choice.models import MultiChoice
+from ..read_aloud.models import ReadAloud
+from ..summarize.models import Summarize
 
 TYPES = [
     ("discuss", "Discuss"),

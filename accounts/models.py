@@ -2,17 +2,16 @@ from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         PermissionsMixin)
 from django.core.mail import send_mail
 from django.db import models
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
 from django.utils import timezone
 # from django.utils.http import urlquote
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
-from django.db.models.signals import post_delete, post_save
-from django.dispatch import receiver
-
 
 class CustomUserManager(BaseUserManager):
-    def _create_user(self, email, phone, password, is_student, is_staff, is_superuser, **extra_fields):
+    def _create_user(self, email, phone, password, is_student, is_organization, is_staff, is_superuser, **extra_fields):
         now = timezone.now()
 
         if not email:
@@ -23,6 +22,7 @@ class CustomUserManager(BaseUserManager):
                 email=email,
                 phone=phone,
                 is_student=is_student,
+                is_organization=is_organization,
                 is_staff=is_staff,
                 is_active=True,
                 is_superuser=is_superuser,
@@ -34,11 +34,11 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_user(self, email, phone=None, password=None, **extra_fields):
-        return self._create_user(email, phone, password, False, False, False, **extra_fields)
+    def create_user(self, email, phone=None, password=None, is_student=False, is_organization=False, **extra_fields):
+        return self._create_user(email, phone, password, is_student, is_organization, False, False, **extra_fields)
 
     def create_superuser(self, email, phone, password, **extra_fields):
-        return self._create_user(email, phone, password, False, True, True, **extra_fields)
+        return self._create_user(email, phone, password, False, False, True, True, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
@@ -47,6 +47,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     picture = models.ImageField(upload_to="media/user")
     date_joined = models.DateTimeField(_('date joined'), auto_now=True)
     is_student   = models.BooleanField(default=False)
+    is_organization   = models.BooleanField(default=False)
     is_active   = models.BooleanField(default=True)
     is_admin    = models.BooleanField(default=False)
     is_staff    = models.BooleanField(default=False)
@@ -73,6 +74,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     #     send_mail(subject, message, from_email, [self.email])
 
 @receiver(post_delete, sender=User)
-def delete_file(sender, instance, created, **kwargs):
+def delete_file(sender, instance, **kwargs):
     if instance.picture:
         instance.picture.delete(False)

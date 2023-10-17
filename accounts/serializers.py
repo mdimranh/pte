@@ -1,6 +1,5 @@
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers
-from phonenumber_field.serializerfields import PhoneNumberField
 
 from .models import User
 
@@ -12,6 +11,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
+        validated_data['is_student'] = True
         user = User.objects.create_user(**validated_data)
         user.set_password(validated_data['password'])
         return user
