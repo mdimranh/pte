@@ -2,10 +2,10 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.generics import (CreateAPIView, ListAPIView,
                                      ListCreateAPIView, RetrieveAPIView)
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from accounts.security.permission import IsStudentPermission
 from ..discussion.views import CustomPagination
 from .models import MissingWord
 from .serializers import *
@@ -17,6 +17,7 @@ class MissingWordListAPIView(ListAPIView):
     pagination_class = CustomPagination
 
 class MissingWordCreateAPIView(CreateAPIView):
+    permission_classes = [IsAdminUser]
     queryset = MissingWord.objects.all()
     serializer_class = MissingWordSerializer
     pagination_class = CustomPagination
@@ -28,7 +29,7 @@ class MissingWordDetailsView(RetrieveAPIView):
     queryset = MissingWord.objects.all()
 
 class MissingWordAnswerCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsStudentPermission]
 
     def calculate_score(self, correct_answers, selected_answers, incorrect_penalty=1):
         score = 0
@@ -68,7 +69,7 @@ class MissingWordAnswerListView(ListAPIView):
 
 class MyAnswerListView(ListAPIView):
     serializer_class = MissingWordAnswerListSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsStudentPermission,)
     def get_queryset(self):
         # Get the primary key (pk) from the URL query parameters
         pk = self.kwargs.get('pk')

@@ -24,6 +24,7 @@ class ReplySerializer(serializers.ModelSerializer):
     class Meta:
         model = Discussion
         fields = [
+            "id",
             'body',
             "images",
             'self_like',
@@ -47,6 +48,7 @@ class DiscussionListSerializer(serializers.ModelSerializer):
         model = Discussion
         fields = [
             # "total_like",
+            "id",
             "self_like",
             'body',
             "images",

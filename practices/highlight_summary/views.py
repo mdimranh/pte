@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from rest_framework.generics import (CreateAPIView, ListAPIView,
                                      ListCreateAPIView, RetrieveAPIView)
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from accounts.security.permission import IsStudentPermission
 from ..discussion.views import CustomPagination
 from .models import HighlightSummary
 from .serializers import *
@@ -16,6 +16,7 @@ class HighlightSummaryListAPIView(ListAPIView):
     pagination_class = CustomPagination
 
 class HighlightSummaryCreateAPIView(CreateAPIView):
+    permission_classes = [IsAdminUser]
     queryset = HighlightSummary.objects.all()
     serializer_class = HighlightSummarySerializer
     pagination_class = CustomPagination
@@ -27,7 +28,7 @@ class HighlightSummaryDetailsView(RetrieveAPIView):
     queryset = HighlightSummary.objects.all()
 
 class HighlightSummaryAnswerCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsStudentPermission]
 
     def post(self, request):
         serializer = HighlightSummaryAnswerCreateSerializer(data=request.data)
@@ -56,7 +57,7 @@ class HighlightSummaryAnswerListView(ListAPIView):
 
 class MyAnswerListView(ListAPIView):
     serializer_class = HighlightSummaryAnswerListSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsStudentPermission,)
     def get_queryset(self):
         # Get the primary key (pk) from the URL query parameters
         pk = self.kwargs.get('pk')
