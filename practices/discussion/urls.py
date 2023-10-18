@@ -11,6 +11,6 @@ urlpatterns = [
     path('dictation/<str:id>/discussions', DictationDiscussionListView.as_view()),
     path('discussion', DiscussionCreateView.as_view()),
     path('<model>/discussion', DiscussionAdd.as_view()),
-    path('discussion/<int:pk>/like/', LikeDiscussion.as_view()),
-    path('discussion/<int:pk>', DiscussionDelete.as_view())
+    path('discussion/<int:id>/like', LikeDiscussion.as_view()),
+    path('discussion/<int:id>', DiscussionDelete.as_view())
 ]
