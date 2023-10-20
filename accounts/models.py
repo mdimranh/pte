@@ -42,7 +42,7 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
-    phone = PhoneNumberField(unique=True)
+    phone = PhoneNumberField(unique=True, blank=True, null=True)
     full_name = models.CharField(max_length=255, blank=True)
     picture = models.ImageField(upload_to="media/user")
     date_joined = models.DateTimeField(_('date joined'), auto_now=True)
@@ -70,8 +70,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.full_name
 
-    # def email_user(self, subject, message, from_email=None):
-    #     send_mail(subject, message, from_email, [self.email])
 
 @receiver(post_delete, sender=User)
 def delete_file(sender, instance, **kwargs):
