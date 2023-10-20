@@ -2,14 +2,15 @@ from rest_framework import status
 from rest_framework.generics import (GenericAPIView, ListAPIView,
                                      RetrieveAPIView)
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from accounts.models import User
 from accounts.security.permission import IsOrganizationPermission
 from accounts.serializers import UserCreateSerializer, UserDetailsSerializer
+from management.models import Purchase
 from practices.discussion.views import CustomPagination
 
-from .serializers import (CreateStudentSerializer, StudentDetailsSerializer,
-                          StudentListSerializer)
+from .serializers import *
 
 
 class RegistrationView(GenericAPIView):
@@ -35,3 +36,34 @@ class StudenDetailsView(RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = StudentDetailsSerializer
     permission_classes = [IsOrganizationPermission]
+
+class AssignPlanView(APIView):
+    permission_classes=[IsOrganizationPermission]
+    def post(self, request, *args, **kwargs):
+        data = dict(request.data)
+        serializer = AssignPlanSerializer(data=data)
+        if serializer.is_valid():
+            purchase = Purchase.objects.get(id=serializer.validated_data['plan'].id)
+            purchase.student.add(serializer.validated_data['student'])
+            return Response({
+                "message": "Plan assigned successfully."
+            })
+        return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+
+class ChangePassword(APIView):
+    permission_classes=[IsOrganizationPermission]
+    def post(self, request, *args, **kwargs):
+        data = dict(request.data)
+        serializer = ChangePasswordSerializer(data=data)
+        if serializer.is_valid():
+            if request.user.check_password(serializer.validated_data['my_password']):
+                student = User.objects.get(id=serializer.validated_data['student'].id)
+                student.set_password(serializer.validated_data['new_password'])
+                return Response({
+                    "message": "Password changed successfully."
+                })
+            return Response({
+                "my_password": ["Incorrect password."]
+            })
+        return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
