@@ -2,7 +2,8 @@ from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers
 
 from accounts.models import User
-from management.models import Plan, Profile
+from management.models import Plan, Profile, Purchase
+from management.serializers import PlanSerializer
 
 
 class CreateStudentSerializer(serializers.Serializer):
@@ -53,10 +54,33 @@ class StudentListSerializer(serializers.ModelSerializer):
 class ProfileDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        exclude = ['id', 'user', 'organization']
+        exclude = ['id', 'user']
+
+class PurchaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Plan
+        fields=['title', 'description', 'start_date', 'end_date', 'thumbnail']
 
 class StudentDetailsSerializer(serializers.ModelSerializer):
     profile = ProfileDetailsSerializer(many=True)
+    plans = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ["id", "full_name", "email", "phone", "picture", "profile"]
+        fields = ["id", "full_name", "email", "phone", "picture", "profile", "plans"]
+
+    def get_plans(self, obj):
+        plans_queryset = Purchase.objects.filter(student=obj).values('id')
+        plans = Plan.objects.filter(id__in=plans_queryset)
+        serializer = PurchaseSerializer(data=plans, many=True)
+        serializer.is_valid()
+        return serializer.data
+
+
+class AssignPlanSerializer(serializers.Serializer):
+    plan = serializers.PrimaryKeyRelatedField(queryset=Purchase.objects.all())
+    student = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(is_student=True))
+
+class ChangePasswordSerializer(serializers.Serializer):
+    student = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(is_student=True))
+    my_password = serializers.CharField()
+    new_password = serializers.CharField()
