@@ -37,19 +37,19 @@ class CreateStudentSerializer(serializers.Serializer):
         return user
 
 class ProfileSerializer(serializers.ModelSerializer):
-    premium = serializers.SerializerMethodField()
     class Meta:
         model = Profile
-        fields = ['id', 'userid', 'group', 'premium']
-
-    def get_premium(self, obj):
-        return Profile.objects.get(pk=obj.pk).plan is not None
+        exclude = ["user", 'id']
 
 class StudentListSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(many=True)
+    premium = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ['id', 'full_name', 'picture', 'last_login','profile', ]
+        fields = ['id', 'full_name', 'picture', 'last_login','profile', 'premium']
+
+    def get_premium(self, obj):
+        return Purchase.objects.filter(student=obj.pk).exists()
 
 class ProfileDetailsSerializer(serializers.ModelSerializer):
     class Meta:
