@@ -1,5 +1,6 @@
 from rest_framework import status
-from rest_framework.generics import (GenericAPIView, ListAPIView,
+from rest_framework.generics import (CreateAPIView, GenericAPIView,
+                                     ListAPIView, ListCreateAPIView,
                                      RetrieveAPIView)
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -7,7 +8,7 @@ from rest_framework.views import APIView
 from accounts.models import User
 from accounts.security.permission import IsOrganizationPermission
 from accounts.serializers import UserCreateSerializer, UserDetailsSerializer
-from management.models import Purchase
+from management.models import Group, Purchase
 from practices.discussion.views import CustomPagination
 
 from .serializers import *
@@ -28,7 +29,7 @@ class StudenListView(ListAPIView):
     permission_classes = [IsOrganizationPermission]
     pagination_class = CustomPagination
     def get_queryset(self):
-        queryset = User.objects.filter(plan__organization__id=self.request.user.id)
+        queryset = User.objects.filter(organization__id=self.request.user.id)
         return queryset
 
 class StudenDetailsView(RetrieveAPIView):
@@ -67,3 +68,24 @@ class ChangePassword(APIView):
                 "my_password": ["Incorrect password."]
             })
         return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+class GroupListView(ListAPIView):
+    serializer_class = GroupSerializer
+    permission_classes = [IsOrganizationPermission]
+    def get_queryset(self):
+        queryset = Group.objects.filter(organization__id=self.request.user.id)
+        return queryset
+    
+
+class GroupCreateView(GenericAPIView):
+    permission_classes = [IsOrganizationPermission]
+    serializer_class = GroupCreateSerializer
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        data['organization'] = request.user.id
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        group = serializer.save()
+        return Response(GroupCreateSerializer(group, context=self.get_serializer_context()).data)
+    
