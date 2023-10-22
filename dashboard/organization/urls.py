@@ -8,4 +8,6 @@ urlpatterns = [
     path("student/<int:pk>", StudenDetailsView.as_view()),
     path("plan/assign", AssignPlanView.as_view()),
     path("student/change_password", ChangePassword.as_view()),
+    path("group", GroupCreateView.as_view()),
+    path("groups", GroupListView.as_view()),
 ]

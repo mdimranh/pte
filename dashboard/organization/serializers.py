@@ -2,7 +2,7 @@ from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers
 
 from accounts.models import User
-from management.models import Plan, Profile, Purchase
+from management.models import Group, Plan, Profile, Purchase
 from management.serializers import PlanSerializer
 
 
@@ -84,3 +84,13 @@ class ChangePasswordSerializer(serializers.Serializer):
     student = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(is_student=True))
     my_password = serializers.CharField()
     new_password = serializers.CharField()
+
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = "__all__"
+
+class GroupCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ['name', "organization"]
