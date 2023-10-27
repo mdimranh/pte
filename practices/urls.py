@@ -9,4 +9,7 @@ urlpatterns = [
     path('', include('practices.multi_choice.urls')),
     path('', include('practices.missing_word.urls')),
     path('', include('practices.dictation.urls')),
+    path('', include('practices.write_easy.urls')),
+    path('', include('practices.repeat_sentence.urls')),
+    path('', include('practices.retell_sentence.urls')),
 ]

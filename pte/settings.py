@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'practices.multi_choice',
     'practices.missing_word',
     'practices.dictation',
+    'practices.write_easy',
+    'practices.repeat_sentence',
+    'practices.retell_sentence',
 
     'management',
 
