@@ -5,6 +5,7 @@ from django.urls import include, path
 from rest_framework.authtoken.views import obtain_auth_token
 
 from dashboard.organization.urls import urlpatterns as org_urls
+from dashboard.superadmin.urls import urlpatterns as sadmin_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -13,4 +14,4 @@ urlpatterns = [
     path('', include('practices.urls')),
     path('', include('management.urls')),
     path('api/token/', obtain_auth_token),  # DRF token authentication
-] + org_urls + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + org_urls + sadmin_urls + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

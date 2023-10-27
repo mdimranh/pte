@@ -29,7 +29,7 @@ class StudenListView(ListAPIView):
     permission_classes = [IsOrganizationPermission]
     pagination_class = CustomPagination
     def get_queryset(self):
-        queryset = User.objects.filter(profile__organization__id=self.request.user.id)
+        queryset = User.objects.filter(organization__id=self.request.user.id)
         return queryset
 
 class StudenDetailsView(RetrieveAPIView):

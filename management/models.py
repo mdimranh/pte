@@ -39,6 +39,7 @@ class Profile(models.Model):
     education = models.TextField(blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     group = models.TextField(blank=True, null=True)
+    organization = models.ForeignKey(User, on_delete=models.CASCADE, related_name="org", blank=True, null=True)
 
 class Group(models.Model):
     name = models.CharField(max_length=255)
