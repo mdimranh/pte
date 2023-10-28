@@ -26,6 +26,6 @@ class TestStatisticsView(APIView):
             "multi_choice_single_answer": MultiChoice.objects.filter(single=True).count(),
             "write_easy": WriteEasy.objects.all().count(),
             "repeat_sentence": RepeatSentence.objects.all().count(),
-            "retell_sentence": RetellSentence.objects.all().count(),
+            "retell_sentence": RetellSentence.objects.all().count()
         }
         return JsonResponse(datas)
