@@ -13,5 +13,6 @@ urlpatterns = [
     path('', include('accounts.urls')),
     path('', include('practices.urls')),
     path('', include('management.urls')),
+    path('', include('dashboard.urls')),
     path('api/token/', obtain_auth_token),  # DRF token authentication
 ] + org_urls + sadmin_urls + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'practices',
     'practices.read_aloud',
     'practices.discussion',
     'practices.answer',
@@ -47,6 +48,8 @@ INSTALLED_APPS = [
     'practices.write_easy',
     'practices.repeat_sentence',
     'practices.retell_sentence',
+
+    'dashboard.superadmin',
 
     'management',
 

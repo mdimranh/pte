@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class WriteEasyConfig(AppConfig):
+class PracticesConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'practices.write_easy'
+    name = 'practices'
