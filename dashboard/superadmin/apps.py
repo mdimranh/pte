@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class WriteEasyConfig(AppConfig):
+class SuperadminConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'practices.write_easy'
+    name = 'dashboard.superadmin'
