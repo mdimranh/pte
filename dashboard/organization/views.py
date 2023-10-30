@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.generics import (CreateAPIView, GenericAPIView,
                                      ListAPIView, ListCreateAPIView,
@@ -11,6 +12,8 @@ from accounts.serializers import UserCreateSerializer, UserDetailsSerializer
 from management.models import Group, Purchase
 from practices.discussion.views import CustomPagination
 
+from ..student.models import ExamCountdown
+from ..student.serializers import ExamCountdownListSerializer
 from .serializers import *
 
 
@@ -88,4 +91,9 @@ class GroupCreateView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         group = serializer.save()
         return Response(GroupCreateSerializer(group, context=self.get_serializer_context()).data)
+
+class ExamCalenderView(ListAPIView):
+    permission_classes = [IsOrganizationPermission]
+    serializer_class = ExamCountdownListSerializer
+    queryset = ExamCountdown.objects.filter(exam_date__gte = timezone.now())
     

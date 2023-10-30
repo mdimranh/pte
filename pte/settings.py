@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'practices.retell_sentence',
 
     'dashboard.superadmin',
+    'dashboard.student',
 
     'management',
 
