@@ -31,6 +31,11 @@ GENDER = [
     ("others", "Other's")
 ]
 
+class Group(models.Model):
+    name = models.CharField(max_length=255)
+    organization = models.ForeignKey(User, on_delete=models.CASCADE, related_name="group")
+    created_at = models.DateTimeField(auto_now_add=True)
+
 class Profile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="profile")
     userid = models.CharField(max_length=30, blank=True, null=True)
@@ -38,13 +43,8 @@ class Profile(models.Model):
     gender = models.CharField(max_length=10, choices=GENDER, blank=True, null=True)
     education = models.TextField(blank=True, null=True)
     address = models.TextField(blank=True, null=True)
-    group = models.TextField(blank=True, null=True)
+    group = models.ForeignKey(Group, related_name='group', blank=True, null=True, on_delete=models.SET_NULL)
     organization = models.ForeignKey(User, on_delete=models.CASCADE, related_name="org", blank=True, null=True)
-
-class Group(models.Model):
-    name = models.CharField(max_length=255)
-    organization = models.ForeignKey(User, on_delete=models.CASCADE, related_name="group")
-    created_at = models.DateTimeField(auto_now_add=True)
 
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):

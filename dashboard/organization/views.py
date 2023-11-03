@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta
+
+from django.db.models import Count, Sum
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.generics import (CreateAPIView, GenericAPIView,
@@ -7,7 +10,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import User
-from accounts.security.permission import IsOrganizationPermission
+from accounts.security.permission import (IsOrganizationPermission,
+                                          IsStudentPermission)
 from accounts.serializers import UserCreateSerializer, UserDetailsSerializer
 from management.models import Group, Purchase
 from practices.discussion.views import CustomPagination
@@ -96,4 +100,35 @@ class ExamCalenderView(ListAPIView):
     permission_classes = [IsOrganizationPermission]
     serializer_class = ExamCountdownListSerializer
     queryset = ExamCountdown.objects.filter(exam_date__gte = timezone.now())
+
+class StudentDataCounts(APIView):
+    permission_classes = (IsStudentPermission,)
+    def get(self, request):
+        total_student = User.objects.filter(profile__organization = request.user).count()
+        premium_student = Purchase.objects.filter(organization=request.user).aggregate(total_students=Count('student')).get('total_students')
+        total_max_accounts = Purchase.objects.filter(organization=request.user).aggregate(total_max_accounts=Sum('plan__maximum_accounts')).get('total_max_accounts')
+        total_student = 0 if total_student is None else total_student
+        premium_student = 0 if premium_student is None else premium_student
+        total_max_accounts = 0 if total_max_accounts is None else total_max_accounts
+        print(total_student, premium_student)
+        return Response({
+            "total_student": total_student,
+            "premium_student": premium_student,
+            "free_students": total_student - premium_student,
+            "account_remaining": max(0, total_max_accounts - total_student),
+            "exam_in_7_days": 0,
+            "score_75_90": 0,
+            "score_55_45": 0,
+            "score_55_0": 0
+        })
+
+class RecentJoinedStudentList(ListAPIView):
+    permission_classes = [IsOrganizationPermission]
+    serializer_class = StudentListSerializer
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        queryset = User.objects.filter(profile__organization=self.request.user, date_joined__gte=timezone.now() - timedelta(days=30))
+        return queryset
+    
     

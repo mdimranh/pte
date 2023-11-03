@@ -28,7 +28,7 @@ class MultiChoiceListSerializer(serializers.ModelSerializer):
     class Meta:
         model = MultiChoice
         fields = [
-            "id", "title", "audio", "options"
+            "id", "title", "audio", "options", "appeared", "prediction"
         ]
 
 class MultiChoiceAnswerCreateSerializer(serializers.ModelSerializer):
