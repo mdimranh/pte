@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'practices.write_easy',
     'practices.repeat_sentence',
     'practices.retell_sentence',
+    'practices.short_question',
 
     'dashboard.superadmin',
     'dashboard.student',
@@ -219,7 +220,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # simple jwt configuration
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,

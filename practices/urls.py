@@ -12,4 +12,5 @@ urlpatterns = [
     path('', include('practices.write_easy.urls')),
     path('', include('practices.repeat_sentence.urls')),
     path('', include('practices.retell_sentence.urls')),
+    path('', include('practices.short_question.urls')),
 ]
