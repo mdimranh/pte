@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.http import Http404, JsonResponse
 from rest_framework import status
 from rest_framework.generics import (CreateAPIView, DestroyAPIView,
-                                     GenericAPIView, ListAPIView)
+                                     GenericAPIView, ListAPIView, UpdateAPIView)
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -33,12 +33,6 @@ class AdminUserAddView(GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        # try:
-        #     user = serializer.save()
-        # except IntegrityError:
-        #     return Response({
-        #         "email": "User already exists with this email.",
-        #     }, status=status.HTTP_409_CONFLICT)
         user = serializer.save()
         return Response(AdminUserSerializer(user, context=self.get_serializer_context()).data)
 
@@ -93,7 +87,18 @@ class StudyMaterialListAPIView(ListAPIView):
         if category not in available_categories:
             raise Http404("Page not found")
         if category == 'all':
-            return StudyMaterial.objects.all()
+            if self.request.user.is_student:
+                profile = Profile.objects.filter(user=request.user)
+                if profile is not None and profile.organization is not None:
+                    return StudyMaterial.objects.all()
+                else:
+                    return StudyMaterial.objects.filter(premium=False)
+        if self.request.user.is_student:
+            profile = Profile.objects.filter(user=request.user)
+            if profile is not None and profile.organization is not None:
+                return StudyMaterial.objects.filter(category=category)
+            else:
+                return StudyMaterial.objects.filter(premium=False, category=category)
         return StudyMaterial.objects.filter(category=category)
     
 
@@ -119,3 +124,4 @@ class OrganizationListView(ListAPIView):
     permission_classes = (IsAdminUser,)
     serializer_class = OrganizationSerializer
     queryset = User.objects.filter(is_organization=True)
+

@@ -9,7 +9,7 @@ from rest_framework.generics import (CreateAPIView, GenericAPIView,
                                      RetrieveAPIView)
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from rest_framework.permissions import IsAdminUser
 from accounts.models import User
 from accounts.security.permission import (IsOrganizationPermission,
                                           IsStudentPermission)
@@ -24,7 +24,7 @@ from .serializers import *
 
 class RegistrationView(GenericAPIView):
     serializer_class = CreateStudentSerializer
-    permission_classes = (IsOrganizationPermission,)
+    permission_classes = [IsOrganizationPermission | IsAdminUser]
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -34,10 +34,13 @@ class RegistrationView(GenericAPIView):
 
 class StudenListView(ListAPIView):
     serializer_class = StudentListSerializer
-    permission_classes = [IsOrganizationPermission]
+    permission_classes = [IsOrganizationPermission | IsAdminUser]
     pagination_class = CustomPagination
     def get_queryset(self):
-        queryset = User.objects.filter(organization__id=self.request.user.id)
+        if self.request.user.is_organization:
+            queryset = User.objects.filter(profile__organization__id=self.request.user.id)
+        else:
+            queryset = User.objects.all()
         return queryset
 
 class StudenDetailsView(RetrieveAPIView):

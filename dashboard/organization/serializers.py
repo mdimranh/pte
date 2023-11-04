@@ -2,7 +2,6 @@ from django.db import transaction
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers, status
 from rest_framework.response import Response
-
 from accounts.models import User
 from management.models import Group, Plan, Profile, Purchase
 from management.serializers import PlanSerializer
@@ -14,10 +13,12 @@ class CreateStudentSerializer(serializers.Serializer):
     password = serializers.CharField(required=True)
     full_name = serializers.CharField(required=True)
     plan = serializers.PrimaryKeyRelatedField(queryset=Plan.objects.all())
-    group = serializers.CharField()
+    group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all())
+    organization = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(is_organization=True), required=False)
 
     def create(self, validated_data):
         with transaction.atomic():
+            current_user = self.context.get("request").user
             user_data = {
                 'is_student': True,
                 'password': validated_data.get('password'),
@@ -33,23 +34,39 @@ class CreateStudentSerializer(serializers.Serializer):
             )
             profile.userid = validated_data['userid']
             profile.plan = validated_data['plan']
-            profile.organization = self.context['request'].user
+            if current_user.is_organization:
+                profile.organization = self.context['request'].user
+            else:
+                if 'organization' in validated_data:
+                    profile.organization = validated_data['organization']
             if 'group' in validated_data:
                 profile.group = validated_data['group']
             profile.save()
             return user
 
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ['name']
+
+class OrganizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["full_name"]
+
 class ProfileSerializer(serializers.ModelSerializer):
+    group = GroupSerializer()
+    organization = OrganizationSerializer()
     class Meta:
         model = Profile
-        exclude = ["user", 'id']
+        fields = ["userid", "birth_date", "gender", "education", "address", "group", "organization"]
 
 class StudentListSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(many=True)
     premium = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ['id', 'full_name', 'picture', 'last_login','profile', 'premium']
+        fields = ['id', 'full_name', 'picture', 'last_login', 'profile', 'premium']
 
     def get_premium(self, obj):
         return Purchase.objects.filter(student=obj.pk).exists()
