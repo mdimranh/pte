@@ -120,6 +120,26 @@ class OrgRegistrationView(GenericAPIView):
         user = serializer.save()
         return Response(OrganizationSerializer(user, context=self.get_serializer_context()).data)
 
+class OrgPasswordChange(APIView):
+    permission_classes = [IsAdminUser]
+    def put(self, request, *args, **kwargs):
+        data = request.data
+        if "password" not in data:
+            return Response({
+                "password": "Pasword can't be null."
+            }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        id = self.kwargs.get('id')
+        user = User.objects.filter(id=id, is_organization=True).first()
+        if user is None:
+            return Response({
+                "error": "Organization not found."
+            }, status=status.HTTP_404_NOT_FOUND)
+        user.set_password(data['password'])
+        user.save()
+        return Response({
+            "success": "Password have been changed successfully."
+        })
+
 class OrganizationListView(ListAPIView):
     permission_classes = (IsAdminUser,)
     serializer_class = OrganizationSerializer

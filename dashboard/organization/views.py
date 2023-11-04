@@ -45,11 +45,35 @@ class StudenListView(ListAPIView):
             queryset = User.objects.all()
         return queryset
 
-class StudenDetailsView(RetrieveDestroyAPIView):
+class StudenRetriveDestroApiView(RetrieveDestroyAPIView):
     lookup_field = "pk"
     queryset = User.objects.filter(is_student=True)
     serializer_class = StudentDetailsSerializer
     permission_classes = [IsOrganizationPermission | IsAdminUser]
+
+# class StudentUpdateApiView(APIView):
+
+    
+
+class StudentPasswordChange(APIView):
+    permission_classes = [IsOrganizationPermission | IsAdminUser]
+    def put(self, request, *args, **kwargs):
+        data = request.data
+        if "password" not in data:
+            return Response({
+                "password": "Pasword can't be null."
+            }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        id = self.kwargs.get('id')
+        user = User.objects.filter(id=id).first()
+        if user is None:
+            return Response({
+                "error": "Student not found."
+            }, status=status.HTTP_404_NOT_FOUND)
+        user.set_password(data['password'])
+        user.save()
+        return Response({
+            "success": "Password have been changed successfully."
+        })
 
 class AssignPlanView(APIView):
     permission_classes=[IsOrganizationPermission]

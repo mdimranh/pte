@@ -95,7 +95,6 @@ class StudentDetailsSerializer(serializers.ModelSerializer):
         serializer.is_valid()
         return serializer.data
 
-
 class AssignPlanSerializer(serializers.Serializer):
     plan = serializers.PrimaryKeyRelatedField(queryset=Purchase.objects.all())
     student = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(is_student=True))
