@@ -4,12 +4,14 @@ from django.db.models import Count, Sum
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import (CreateAPIView, GenericAPIView,
-                                     ListAPIView, ListCreateAPIView,
-                                     RetrieveAPIView)
+from rest_framework.generics import (CreateAPIView, DestroyAPIView,
+                                     GenericAPIView, ListAPIView,
+                                     ListCreateAPIView, RetrieveAPIView,
+                                     RetrieveDestroyAPIView)
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAdminUser
+
 from accounts.models import User
 from accounts.security.permission import (IsOrganizationPermission,
                                           IsStudentPermission)
@@ -43,11 +45,11 @@ class StudenListView(ListAPIView):
             queryset = User.objects.all()
         return queryset
 
-class StudenDetailsView(RetrieveAPIView):
+class StudenDetailsView(RetrieveDestroyAPIView):
     lookup_field = "pk"
-    queryset = User.objects.all()
+    queryset = User.objects.filter(is_student=True)
     serializer_class = StudentDetailsSerializer
-    permission_classes = [IsOrganizationPermission]
+    permission_classes = [IsOrganizationPermission | IsAdminUser]
 
 class AssignPlanView(APIView):
     permission_classes=[IsOrganizationPermission]
