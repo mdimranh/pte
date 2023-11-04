@@ -27,6 +27,7 @@ class SuperAdminCreateSerializer(serializers.Serializer):
             }
             user = User.objects.create_user(**user_data)
             user.set_password(validated_data['password'])
+            user.save()
             profile, create = Profile.objects.get_or_create(
                 user=user
             )
@@ -76,6 +77,7 @@ class CreateOrganizationSerializer(serializers.Serializer):
             user_data['phone'] = validated_data['phone']
         user = User.objects.create_user(**user_data)
         user.set_password(validated_data['password'])
+        user.save()
         profile, create = Profile.objects.get_or_create(
             user=user
         )

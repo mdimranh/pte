@@ -27,6 +27,7 @@ class CreateStudentSerializer(serializers.Serializer):
                 user_data['email'] = validated_data['email']
             user = User.objects.create_user(**user_data)
             user.set_password(validated_data['password'])
+            user.save()
             profile, create = Profile.objects.get_or_create(
                 user=user
             )
