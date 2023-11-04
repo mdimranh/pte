@@ -6,6 +6,7 @@ from django.dispatch import receiver
 
 from accounts.models import User
 
+from ..describe_image.models import DescribeImage
 from ..dictation.models import Dictation
 from ..highlight_summary.models import HighlightSummary
 from ..missing_word.models import MissingWord
@@ -13,6 +14,7 @@ from ..multi_choice.models import MultiChoice
 from ..read_aloud.models import ReadAloud
 from ..repeat_sentence.models import RepeatSentence
 from ..retell_sentence.models import RetellSentence
+from ..short_question.models import ShortQuestion
 from ..summarize.models import Summarize
 from ..write_easy.models import WriteEasy
 
@@ -27,6 +29,8 @@ class Answer(models.Model):
     write_easy = models.ForeignKey(WriteEasy, blank=True, null=True, on_delete=models.CASCADE)
     repeat_sentence = models.ForeignKey(RepeatSentence, blank=True, null=True, on_delete=models.CASCADE)
     retell_sentence = models.ForeignKey(RetellSentence, blank=True, null=True, on_delete=models.CASCADE)
+    describe_image = models.ForeignKey(DescribeImage, blank=True, null=True, on_delete=models.CASCADE)
+    short_question = models.ForeignKey(ShortQuestion, blank=True, null=True, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     audio = models.FileField(blank=True, null=True, upload_to="media/answer/%Y/%m/%d/", validators=[FileExtensionValidator(['wav'])])
     summarize_text = models.TextField(blank=True, null=True)

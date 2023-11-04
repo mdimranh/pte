@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'practices.repeat_sentence',
     'practices.retell_sentence',
     'practices.short_question',
+    'practices.describe_image',
 
     'dashboard.superadmin',
     'dashboard.student',
