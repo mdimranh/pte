@@ -42,7 +42,7 @@ class StudenListView(ListAPIView):
         if self.request.user.is_organization:
             queryset = User.objects.filter(profile__organization__id=self.request.user.id)
         else:
-            queryset = User.objects.all()
+            queryset = User.objects.filter(is_student=True)
         return queryset
 
 class StudenRetriveDestroApiView(RetrieveDestroyAPIView):
@@ -111,6 +111,14 @@ class GroupListView(ListAPIView):
     permission_classes = [IsOrganizationPermission]
     def get_queryset(self):
         queryset = Group.objects.filter(organization__id=self.request.user.id)
+        return queryset
+
+class OrgGroupListView(ListAPIView):
+    serializer_class = GroupSerializer
+    permission_classes = [IsAdminUser]
+    def get_queryset(self):
+        oid = self.kwargs.get("oid") 
+        queryset = Group.objects.filter(organization__id=oid)
         return queryset
     
 

@@ -10,6 +10,7 @@ urlpatterns = [
     path("plan/assign", AssignPlanView.as_view()),
     path("student/change_password", ChangePassword.as_view()),
     path("group", GroupCreateView.as_view()),
+    path("<int:oid>/groups", OrgGroupListView.as_view()),
     path("groups", GroupListView.as_view()),
     path("exam_calender", ExamCalenderView.as_view()),
     path("student/counts", StudentDataCounts.as_view()),

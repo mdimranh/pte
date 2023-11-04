@@ -47,12 +47,12 @@ class CreateStudentSerializer(serializers.Serializer):
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ['name']
+        fields = ['id', 'name']
 
 class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["full_name"]
+        fields = ['id', "full_name"]
 
 class ProfileSerializer(serializers.ModelSerializer):
     group = GroupSerializer()

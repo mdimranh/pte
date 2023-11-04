@@ -97,7 +97,7 @@ class OrganizationSerializer(serializers.ModelSerializer):
     profile = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ['full_name', 'phone', 'email', 'picture', 'profile']
+        fields = ['id', 'full_name', 'phone', 'email', 'picture', 'profile']
 
     def get_profile(self, obj):
         profile = Profile.objects.filter(user__id=obj.id).first()

@@ -93,6 +93,8 @@ class StudyMaterialListAPIView(ListAPIView):
                     return StudyMaterial.objects.all()
                 else:
                     return StudyMaterial.objects.filter(premium=False)
+            else:
+                return StudyMaterial.objects.all()
         if self.request.user.is_student:
             profile = Profile.objects.filter(user=request.user)
             if profile is not None and profile.organization is not None:
