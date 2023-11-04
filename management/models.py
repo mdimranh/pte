@@ -45,6 +45,8 @@ class Profile(models.Model):
     address = models.TextField(blank=True, null=True)
     group = models.ForeignKey(Group, related_name='group', blank=True, null=True, on_delete=models.SET_NULL)
     organization = models.ForeignKey(User, on_delete=models.CASCADE, related_name="org", blank=True, null=True)
+    country = models.CharField(max_length=50, blank=True, null=True)
+    org_name = models.CharField(max_length=255, blank=True, null=True)
 
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):

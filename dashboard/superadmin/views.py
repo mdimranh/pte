@@ -1,8 +1,8 @@
 from django.http import Http404, JsonResponse
-from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView, GenericAPIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.views import APIView
-
+from accounts.models import User
 from practices.dictation.models import Dictation
 from practices.highlight_summary.models import HighlightSummary
 from practices.missing_word.models import MissingWord
@@ -12,9 +12,9 @@ from practices.repeat_sentence.models import RepeatSentence
 from practices.retell_sentence.models import RetellSentence
 from practices.summarize.models import Summarize
 from practices.write_easy.models import WriteEasy
-
+from rest_framework.response import Response
 from .models import StudyMaterial
-from .serializers import StudyMaterialSerializer
+from .serializers import StudyMaterialSerializer, CreateOrganizationSerializer, OrganizationSerializer
 
 
 class TestStatisticsView(APIView):
@@ -60,3 +60,19 @@ class StudyMaterialDestroyAPIView(DestroyAPIView):
     permission_classes = [IsAdminUser]
     queryset = StudyMaterial.objects.all()
     serializer_class = StudyMaterialSerializer
+
+
+class OrgRegistrationView(GenericAPIView):
+    serializer_class = CreateOrganizationSerializer
+    permission_classes = (IsAdminUser,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response(OrganizationSerializer(user, context=self.get_serializer_context()).data)
+
+class OrganizationListView(ListAPIView):
+    permission_classes = (IsAdminUser,)
+    serializer_class = OrganizationSerializer
+    queryset = User.objects.filter(is_organization=True)
