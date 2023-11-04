@@ -14,4 +14,5 @@ urlpatterns = [
     path('', include('practices.retell_sentence.urls')),
     path('', include('practices.short_question.urls')),
     path('', include('practices.describe_image.urls')),
+    path('', include('practices.reorder_paragraph.urls')),
 ]

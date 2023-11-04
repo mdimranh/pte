@@ -12,6 +12,7 @@ from ..highlight_summary.models import HighlightSummary
 from ..missing_word.models import MissingWord
 from ..multi_choice.models import MultiChoice
 from ..read_aloud.models import ReadAloud
+from ..reorder_paragraph.models import ReorderParagraph
 from ..repeat_sentence.models import RepeatSentence
 from ..retell_sentence.models import RetellSentence
 from ..short_question.models import ShortQuestion
@@ -31,6 +32,7 @@ class Answer(models.Model):
     retell_sentence = models.ForeignKey(RetellSentence, blank=True, null=True, on_delete=models.CASCADE)
     describe_image = models.ForeignKey(DescribeImage, blank=True, null=True, on_delete=models.CASCADE)
     short_question = models.ForeignKey(ShortQuestion, blank=True, null=True, on_delete=models.CASCADE)
+    reorder_paragraph = models.ForeignKey(ReorderParagraph, blank=True, null=True, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     audio = models.FileField(blank=True, null=True, upload_to="media/answer/%Y/%m/%d/", validators=[FileExtensionValidator(['wav'])])
     summarize_text = models.TextField(blank=True, null=True)

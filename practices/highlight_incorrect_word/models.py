@@ -24,31 +24,13 @@ schema = {
     },
 }
 
-class MultiChoice(models.Model):
+class HighlightIncorrectWord(models.Model):
     title = models.TextField(unique=True)
-    audio = models.FileField(upload_to="media/multi_choice/%Y/%m/%d/")
+    audio = models.FileField(upload_to="media/missing_word/%Y/%m/%d/")
     options = jsonField(schema=schema, validators=[JsonValidator])
     right_options = ArrayField(models.TextField())
-    bookmark = models.ManyToManyField(User, blank=True, related_name='mc_bookmark')
+    bookmark = models.ManyToManyField(User, blank=True, related_name='hiw_bookmark')
     prediction = models.BooleanField(default=False)
-    single = models.BooleanField(default=False)
-    appeared = models.IntegerField(default=0)
-
-    def practiced(self):
-        return self.answer_set.count()
-
-    def __str__(self):
-        return self.title
-
-
-class MultiChoiceReading(models.Model):
-    title = models.TextField(unique=True)
-    content = models.TextField()
-    options = jsonField(schema=schema, validators=[JsonValidator])
-    right_options = ArrayField(models.TextField())
-    bookmark = models.ManyToManyField(User, blank=True, related_name='mcr_bookmark')
-    prediction = models.BooleanField(default=False)
-    single = models.BooleanField(default=False)
     appeared = models.IntegerField(default=0)
 
     def practiced(self):
