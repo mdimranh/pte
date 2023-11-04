@@ -104,3 +104,31 @@ class OrganizationSerializer(serializers.ModelSerializer):
         if profile is not None:
             return OrgProfileSerializer(instance=profile).data
         return {}
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['org_name', 'address', 'country']
+
+class OrganizationUpdateSerializer(serializers.Serializer):
+    full_name = serializers.CharField(required=False)
+    email = serializers.EmailField(required=False)
+    phone = PhoneNumberField(required=False)
+    profile = UpdateProfileSerializer(required=False)
+
+    def create(self, validated_data):
+        user_id = self.context.get('id')
+        with transaction.atomic():
+            user = User.objects.get(id=user_id)
+            user.full_name = validated_data.get('full_name', user.full_name)
+            user.email = validated_data.get('email', user.email)
+            user.phone = validated_data.get('phone', user.phone)
+            user.save()
+
+            profile_instance, created = Profile.objects.get_or_create(user=user)
+            profile_data = validated_data.get('profile', {})
+
+            profile_serializer = UpdateProfileSerializer(profile_instance, data=profile_data)
+            if profile_serializer.is_valid():
+                profile_serializer.save()
+            return user
