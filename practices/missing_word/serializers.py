@@ -7,9 +7,14 @@ from .models import MissingWord
 
 class MissingWordSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
-        if attrs.get('right_options') is not None and attrs.get('options') is not None:
-            for option in attrs.get('right_options'):
-                if  option not in attrs.get('options'):
+        options, right_options = attrs.get('options'), attrs.get('right_options')
+        if options is not None and right_options is not None:
+            for roption in right_options:
+                found = False
+                for option in options:
+                    if option.get('value') == roption:
+                        found = True
+                if not found:
                     raise serializers.ValidationError({"right_options": ["right_options not in options"]})
         return attrs
 
@@ -36,8 +41,9 @@ class MissingWordAnswerCreateSerializer(serializers.ModelSerializer):
     answers = serializers.ListField(child=serializers.CharField())
 
     def validate(self, data):
+        options = [option.get('value') for option in data.get('missing_word').options]
         for answer in data.get('answers'):
-            if answer not in data.get('missing_word').options:
+            if answer not in options:
                 raise serializers.ValidationError({"answers": ["Not in options"]})
         return data
 

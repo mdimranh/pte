@@ -1,8 +1,13 @@
+from django.db.models import Q
 from django.http import Http404, JsonResponse
-from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView, GenericAPIView
+from rest_framework.generics import (CreateAPIView, DestroyAPIView,
+                                     GenericAPIView, ListAPIView)
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.views import APIView
+
 from accounts.models import User
+from accounts.security.permission import IsSuperAdmin
 from practices.dictation.models import Dictation
 from practices.highlight_summary.models import HighlightSummary
 from practices.missing_word.models import MissingWord
@@ -12,10 +17,40 @@ from practices.repeat_sentence.models import RepeatSentence
 from practices.retell_sentence.models import RetellSentence
 from practices.summarize.models import Summarize
 from practices.write_easy.models import WriteEasy
-from rest_framework.response import Response
-from .models import StudyMaterial
-from .serializers import StudyMaterialSerializer, CreateOrganizationSerializer, OrganizationSerializer
 
+from .models import StudyMaterial
+from .serializers import (AdminUserSerializer, CreateOrganizationSerializer,
+                          OrganizationSerializer, StudyMaterialSerializer,
+                          SuperAdminCreateSerializer)
+
+
+class AdminUserAddView(GenericAPIView):
+    serializer_class = SuperAdminCreateSerializer
+    permission_classes = (IsAdminUser,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response(AdminUserSerializer(user, context=self.get_serializer_context()).data)
+
+class AdminUserListView(ListAPIView):
+    permission_classes = (IsAdminUser,)
+    serializer_class = AdminUserSerializer
+    
+    def get_queryset(self):
+        queryset = User.objects.filter(Q(is_admin=True) | Q(is_staff=True)).exclude(id=self.request.user.id)
+        return queryset
+
+class DeleteAdminUserView(DestroyAPIView):
+    lookup_field = 'id'
+    serializer_class = AdminUserSerializer
+    permission_classes = [IsSuperAdmin]
+
+    def get_queryset(self):
+        queryset = User.objects.filter(id=self.kwargs['id']).exclude(id=self.request.user.id)
+        return queryset
+    
 
 class TestStatisticsView(APIView):
     # permission_classes = [IsAdminUser]
