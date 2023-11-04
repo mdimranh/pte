@@ -45,14 +45,26 @@ class StudenListView(ListAPIView):
             queryset = User.objects.filter(is_student=True)
         return queryset
 
-class StudenRetriveDestroApiView(RetrieveDestroyAPIView):
+class StudenRetriveDestroyApiView(RetrieveDestroyAPIView):
     lookup_field = "pk"
     queryset = User.objects.filter(is_student=True)
     serializer_class = StudentDetailsSerializer
     permission_classes = [IsOrganizationPermission | IsAdminUser]
 
-# class StudentUpdateApiView(APIView):
-
+class StudentUpdateApiView(APIView):
+    permission_classes = [IsOrganizationPermission | IsAdminUser]
+    def put(self, request, id):
+        try:
+            student = User.objects.get(id=id, is_student=True)
+        except:
+            return Response({"error": "Student not found"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = StudentUpdateSerializer(data=request.data, context={'id': id})
+        if serializer.is_valid():
+            update = serializer.save()
+            return Response({
+                "success": "Student updated successfully."
+            })
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
 class StudentPasswordChange(APIView):

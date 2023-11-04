@@ -3,7 +3,8 @@ from django.db.models import Q
 from django.http import Http404, JsonResponse
 from rest_framework import status
 from rest_framework.generics import (CreateAPIView, DestroyAPIView,
-                                     GenericAPIView, ListAPIView, UpdateAPIView)
+                                     GenericAPIView, ListAPIView,
+                                     UpdateAPIView)
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -21,9 +22,7 @@ from practices.summarize.models import Summarize
 from practices.write_easy.models import WriteEasy
 
 from .models import StudyMaterial
-from .serializers import (AdminUserSerializer, CreateOrganizationSerializer,
-                          OrganizationSerializer, StudyMaterialSerializer,
-                          SuperAdminCreateSerializer)
+from .serializers import *
 
 
 class AdminUserAddView(GenericAPIView):
@@ -121,6 +120,21 @@ class OrgRegistrationView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         return Response(OrganizationSerializer(user, context=self.get_serializer_context()).data)
+
+class OrganizationUpdateApiView(APIView):
+    permission_classes = [IsAdminUser]
+    def put(self, request, id):
+        try:
+            organization = User.objects.get(id=id, is_organization=True)
+        except:
+            return Response({"error": "Organization not found"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = OrganizationUpdateSerializer(data=request.data, context={'id': id})
+        if serializer.is_valid():
+            update = serializer.save()
+            return Response({
+                "success": "Organization updated successfully."
+            })
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class OrgPasswordChange(APIView):
     permission_classes = [IsAdminUser]

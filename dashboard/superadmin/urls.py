@@ -8,6 +8,7 @@ urlpatterns = [
     path('study_material/<int:id>', StudyMaterialDestroyAPIView.as_view()),
     path("superadmin/test/counts", TestStatisticsView.as_view()),
     path("organization/add", OrgRegistrationView.as_view()),
+    path("organization/<int:id>/update", OrganizationUpdateApiView.as_view()),
     path("organizations", OrganizationListView.as_view()),
     path("organization/<int:id>/passwordchange", OrgPasswordChange.as_view()),
     path("adminuser/add", AdminUserAddView.as_view()),
