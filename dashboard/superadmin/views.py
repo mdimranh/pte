@@ -1,5 +1,7 @@
+from django.db import IntegrityError
 from django.db.models import Q
 from django.http import Http404, JsonResponse
+from rest_framework import status
 from rest_framework.generics import (CreateAPIView, DestroyAPIView,
                                      GenericAPIView, ListAPIView)
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
@@ -31,6 +33,12 @@ class AdminUserAddView(GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        # try:
+        #     user = serializer.save()
+        # except IntegrityError:
+        #     return Response({
+        #         "email": "User already exists with this email.",
+        #     }, status=status.HTTP_409_CONFLICT)
         user = serializer.save()
         return Response(AdminUserSerializer(user, context=self.get_serializer_context()).data)
 

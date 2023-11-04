@@ -1,5 +1,7 @@
+from django.db import transaction
 from phonenumber_field.serializerfields import PhoneNumberField
-from rest_framework import serializers
+from rest_framework import serializers, status
+from rest_framework.response import Response
 
 from accounts.models import User
 from management.models import Group, Plan, Profile, Purchase
@@ -14,27 +16,27 @@ class CreateStudentSerializer(serializers.Serializer):
     plan = serializers.PrimaryKeyRelatedField(queryset=Plan.objects.all())
     group = serializers.CharField()
 
-
     def create(self, validated_data):
-        user_data = {
-            'is_student': True,
-            'password': validated_data.get('password'),
-            "full_name": validated_data.get('full_name')
-        }
-        if 'email' in validated_data:
-            user_data['email'] = validated_data['email']
-        user = User.objects.create_user(**user_data)
-        user.set_password(validated_data['password'])
-        profile, create = Profile.objects.get_or_create(
-            user=user
-        )
-        profile.userid = validated_data['userid']
-        profile.plan = validated_data['plan']
-        profile.organization = self.context['request'].user
-        if 'group' in validated_data:
-            profile.group = validated_data['group']
-        profile.save()
-        return user
+        with transaction.atomic():
+            user_data = {
+                'is_student': True,
+                'password': validated_data.get('password'),
+                "full_name": validated_data.get('full_name')
+            }
+            if 'email' in validated_data:
+                user_data['email'] = validated_data['email']
+            user = User.objects.create_user(**user_data)
+            user.set_password(validated_data['password'])
+            profile, create = Profile.objects.get_or_create(
+                user=user
+            )
+            profile.userid = validated_data['userid']
+            profile.plan = validated_data['plan']
+            profile.organization = self.context['request'].user
+            if 'group' in validated_data:
+                profile.group = validated_data['group']
+            profile.save()
+            return user
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:

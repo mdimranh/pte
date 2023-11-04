@@ -1,5 +1,7 @@
+from django.db import IntegrityError, transaction
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from accounts.models import User
 from management.models import Profile
@@ -16,20 +18,21 @@ class SuperAdminCreateSerializer(serializers.Serializer):
 
 
     def create(self, validated_data):
-        user_data = {
-            'is_staff': True,
-            "full_name": validated_data.get('full_name'),
-            "email": validated_data['email'],
-            "phone": validated_data['phone']
-        }
-        user = User.objects.create_user(**user_data)
-        user.set_password(validated_data['password'])
-        profile, create = Profile.objects.get_or_create(
-            user=user
-        )
-        profile.userid = validated_data['userid']
-        profile.save()
-        return user
+        with transaction.atomic():
+            user_data = {
+                'is_staff': True,
+                "full_name": validated_data.get('full_name'),
+                "email": validated_data['email'],
+                "phone": validated_data['phone']
+            }
+            user = User.objects.create_user(**user_data)
+            user.set_password(validated_data['password'])
+            profile, create = Profile.objects.get_or_create(
+                user=user
+            )
+            profile.userid = validated_data['userid']
+            profile.save()
+            return user
 
 class AdminProfileSerializer(serializers.ModelSerializer):
     class Meta:
