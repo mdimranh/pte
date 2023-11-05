@@ -67,7 +67,7 @@ class StudentListSerializer(serializers.ModelSerializer):
     premium = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ['id', 'full_name', 'picture', 'last_login', 'profile', 'premium']
+        fields = ['id', 'full_name', 'picture', 'last_login', 'profile', 'premium', "email", "phone"]
 
     def get_premium(self, obj):
         return Purchase.objects.filter(student=obj.pk).exists()
