@@ -5,7 +5,7 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth.models import Group
 from django.utils.html import format_html
 
-from .models import User
+from .models import User, SocialAccount
 
 
 class UserCreationForm(forms.ModelForm):
@@ -57,8 +57,8 @@ class UserAdmin(BaseUserAdmin):
     add_form = UserCreationForm
 
     def user_profile(self, obj):
-        if obj.picture and obj.picture.file:
-            return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover;" />'.format(obj.picture.url))
+        if obj.picture:
+            return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover;" />'.format(obj.picture))
         else:
             return format_html('<img src=""/>')
 
@@ -86,6 +86,7 @@ class UserAdmin(BaseUserAdmin):
 
 # Now register the new UserAdmin...
 admin.site.register(User, UserAdmin)
+admin.site.register(SocialAccount)
 # ... and, since we're not using Django's built-in permissions,
 # unregister the Group model from admin.
 # admin.site.unregister(Group)

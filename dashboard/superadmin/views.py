@@ -20,6 +20,7 @@ from practices.repeat_sentence.models import RepeatSentence
 from practices.retell_sentence.models import RetellSentence
 from practices.summarize.models import Summarize
 from practices.write_easy.models import WriteEasy
+from utils.pagination import CustomPagination
 
 from .models import StudyMaterial
 from .serializers import *
@@ -79,6 +80,7 @@ class StudyMaterialCreateAPIView(CreateAPIView):
 class StudyMaterialListAPIView(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = StudyMaterialSerializer
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         category = self.kwargs.get('category')
@@ -101,6 +103,14 @@ class StudyMaterialListAPIView(ListAPIView):
             else:
                 return StudyMaterial.objects.filter(premium=False, category=category)
         return StudyMaterial.objects.filter(category=category)
+
+    def get(self, request, *args, **kwargs):
+        qs = self.get_queryset()
+        page = self.paginate_queryset(qs)
+        if page is not None:
+            serializer = self.serializer_class(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        return Response([])
     
 
 

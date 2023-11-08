@@ -44,7 +44,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     phone = PhoneNumberField(unique=True, blank=True, null=True)
     full_name = models.CharField(max_length=255, blank=True)
-    picture = models.ImageField(upload_to="media/user")
+    image = models.ImageField(upload_to="media/user", blank=True, null=True)
+    image_url = models.TextField(blank=True, null=True)
     date_joined = models.DateTimeField(_('date joined'), auto_now=True)
     is_student   = models.BooleanField(default=False)
     is_organization   = models.BooleanField(default=False)
@@ -63,6 +64,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     # def get_absolute_url(self):
     #     return "/users/%s/" % urlquote(self.email)
+    @property
+    def picture(self):
+        if self.image_url:
+            return self.image_url
+        if self.image:
+            return self.image.url
+        return None
+
 
     def get_full_name(self):
         return self.full_name
@@ -70,8 +79,21 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.full_name
 
+PROVIDERS = [
+    ("facebook", "Facebook"),
+    ("google", "Google"),
+    ("apple", "Apple")
+]
+
+class SocialAccount(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    provider = models.CharField(max_length = 20, choices=PROVIDERS)
+    uid = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
 
 @receiver(post_delete, sender=User)
 def delete_file(sender, instance, **kwargs):
-    if instance.picture:
-        instance.picture.delete(False)
+    if instance.image:
+        instance.image.delete(False)

@@ -17,7 +17,7 @@ from accounts.security.permission import (IsOrganizationPermission,
                                           IsStudentPermission)
 from accounts.serializers import UserCreateSerializer, UserDetailsSerializer
 from management.models import Group, Purchase
-from practices.discussion.views import CustomPagination
+from utils.pagination import CustomPagination
 
 from ..student.models import ExamCountdown
 from ..student.serializers import ExamCountdownListSerializer

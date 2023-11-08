@@ -9,9 +9,8 @@ from rest_framework import status
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User
-from .serializers import (RegistrationSerializer, UserCreateSerializer,
-                          UserDetailsSerializer, UserProfileUpdateSerializer, UserLoginSerializer)
+from .models import User, SocialAccount
+from .serializers import *
 
 
 class RegistrationView(GenericAPIView):
@@ -24,6 +23,31 @@ class RegistrationView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         return Response(UserCreateSerializer(user, context=self.get_serializer_context()).data)
+
+class SocialRegistration(GenericAPIView):
+    serializer_class = SocialRegistrationSerializer
+    authentication_classes = ([])
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        social_account = SocialAccount.objects.filter(uid=serializer.validated_data['uid'], provider=serializer.validated_data['provider']).first()
+        if social_account is not None:
+            user = social_account.user
+            user.image_url = serializer.validated_data['image_url']
+            user.full_name = serializer.validated_data['full_name']
+            user.email = serializer.validated_data['email']
+            user.save()
+        else:
+            user = serializer.save()
+        refresh = RefreshToken.for_user(user)
+        return Response(
+            {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            }
+        )
 
 class UserLoginView(APIView):
     def post(self, request):
@@ -77,10 +101,10 @@ class UserProfileUpload(APIView):
         picture = request.FILES.get('picture')
         if picture:
             user = request.user
-            user.picture = picture
+            user.image = picture
             user.save()
             return Response({
-                'picture': user.picture.url
+                'picture': user.image.url
             }, status=status.HTTP_200_OK)
         else:
             return Response({
