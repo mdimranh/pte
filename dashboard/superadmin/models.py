@@ -16,3 +16,18 @@ class StudyMaterial(models.Model):
 
     class Meta:
         unique_together = ['title', 'category']
+
+COUPON_TYPE = (
+    ('fixed', 'Fixed'),
+    ('percentage', 'Percentage'),
+)
+
+class Coupon(models.Model):
+    title = models.TextField()
+    code = models.CharField(max_length=15)
+    type = models.CharField(max_length=20, choices=COUPON_TYPE)
+    amount = models.IntegerField()
+    max_use = models.IntegerField()
+    start_date = models.DateField()
+    end_date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)

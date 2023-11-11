@@ -4,7 +4,7 @@ from django.http import Http404, JsonResponse
 from rest_framework import status
 from rest_framework.generics import (CreateAPIView, DestroyAPIView,
                                      GenericAPIView, ListAPIView,
-                                     UpdateAPIView)
+                                     UpdateAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView)
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -22,7 +22,7 @@ from practices.summarize.models import Summarize
 from practices.write_easy.models import WriteEasy
 from utils.pagination import CustomPagination
 
-from .models import StudyMaterial
+from .models import StudyMaterial, Coupon
 from .serializers import *
 
 
@@ -170,4 +170,20 @@ class OrganizationListView(ListAPIView):
     permission_classes = (IsAdminUser,)
     serializer_class = OrganizationSerializer
     queryset = User.objects.filter(is_organization=True)
+
+class CouponListCreateAPIView(ListCreateAPIView):
+    queryset = Coupon.objects.all()
+    serializer_class = CouponSerializer
+
+
+class CouponRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Coupon.objects.all()
+    serializer_class = CouponSerializer
+    lookup_field = 'pk'
+
+
+
+
+
+
 

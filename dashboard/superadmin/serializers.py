@@ -6,7 +6,7 @@ from rest_framework.exceptions import ValidationError
 from accounts.models import User
 from management.models import Profile
 
-from .models import StudyMaterial
+from .models import StudyMaterial, Coupon
 
 
 class SuperAdminCreateSerializer(serializers.Serializer):
@@ -132,3 +132,9 @@ class OrganizationUpdateSerializer(serializers.Serializer):
             if profile_serializer.is_valid():
                 profile_serializer.save()
             return user
+
+
+class CouponSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Coupon
+        fields = '__all__'

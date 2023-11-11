@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'practices.reorder_paragraph',
     'practices.highlight_incorrect_word',
 
+    'mocktest',
+
     'dashboard.superadmin',
     'dashboard.student',
 

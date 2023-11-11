@@ -13,5 +13,7 @@ urlpatterns = [
     path("organization/<int:id>/passwordchange", OrgPasswordChange.as_view()),
     path("adminuser/add", AdminUserAddView.as_view()),
     path("adminusers", AdminUserListView.as_view()),
-    path("adminuser/<int:id>", DeleteAdminUserView.as_view())
+    path("adminuser/<int:id>", DeleteAdminUserView.as_view()),
+    path("coupon", CouponListCreateAPIView.as_view()),
+    path("coupon/<int:pk>", CouponRetrieveUpdateDestroyAPIView.as_view()),
 ]
