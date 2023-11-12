@@ -15,4 +15,5 @@ urlpatterns = [
     path('', include('practices.short_question.urls')),
     path('', include('practices.describe_image.urls')),
     path('', include('practices.reorder_paragraph.urls')),
+    path('', include('practices.blank.urls')),
 ]

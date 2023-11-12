@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'practices.describe_image',
     'practices.reorder_paragraph',
     'practices.highlight_incorrect_word',
+    'practices.blank',
 
     'mocktest',
 

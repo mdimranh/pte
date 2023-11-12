@@ -63,7 +63,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ["userid", "birth_date", "gender", "education", "address", "group", "organization"]
 
 class StudentListSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer(many=False)
+    profile = ProfileSerializer(many=True)
     premium = serializers.SerializerMethodField()
     class Meta:
         model = User
