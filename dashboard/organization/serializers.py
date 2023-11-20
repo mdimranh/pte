@@ -13,8 +13,8 @@ class CreateStudentSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(required=True)
     full_name = serializers.CharField(required=True)
-    plan = serializers.PrimaryKeyRelatedField(queryset=Plan.objects.all())
-    group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all())
+    plan = serializers.PrimaryKeyRelatedField(queryset=Plan.objects.all(), required=False)
+    group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), required=False)
     organization = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(is_organization=True), required=False)
 
     def create(self, validated_data):
