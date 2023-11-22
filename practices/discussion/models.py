@@ -41,3 +41,42 @@ class Discussion(models.Model):
     def __str__(self):
         return self.body if len(self.body) < 25 else self.body[:24]+"..."
 
+
+# from django.contrib.contenttypes.fields import GenericForeignKey
+# from django.contrib.contenttypes.models import ContentType
+# from django.db import models
+
+# TYPES = [
+#     ("discuss", "Discuss"),
+#     ("new_question", "New Question"),
+#     ("new_error", "New Error")
+# ]
+
+# class Discussion(models.Model):
+
+#     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name="discussion")
+#     body = models.TextField()
+#     type = models.CharField(max_length=30, choices=TYPES, default='discuss')
+#     images = ArrayField(models.ImageField(upload_to="media/discussion"), blank=True, null=True)
+#     like = models.ManyToManyField(User, related_name="like", blank=True)
+#     parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='replies')
+#     created_at = models.DateTimeField(auto_now_add=True)
+    
+#     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+#     object_id = models.PositiveIntegerField()
+#     content_object = GenericForeignKey("content_type", "object_id")
+
+#     def total_like(self):
+#         return self.like.count()
+
+#     def total_replies(self):
+#         return Discussion.objects.filter(parent=self.id).count()
+
+#     def __str__(self):
+#         return self.body if len(self.body) < 25 else self.body[:24]+"..."
+
+#     class Meta:
+#         indexes = [
+#             models.Index(fields=["content_type", "object_id"]),
+#         ]
+
