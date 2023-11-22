@@ -1,8 +1,9 @@
-from django.db import models
 from django.contrib.postgres.fields import ArrayField
+from django.db import models
+
+from accounts.models import User
 from utils.fields import jsonField
 from utils.validators import JsonValidator
-from accounts.models import User
 
 schema = {
     "type" : "list",

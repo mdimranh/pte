@@ -6,7 +6,7 @@ from rest_framework.exceptions import ValidationError
 from accounts.models import User
 from management.models import Profile
 
-from .models import StudyMaterial, Coupon
+from .models import Coupon, StudyMaterial
 
 
 class SuperAdminCreateSerializer(serializers.Serializer):
@@ -138,3 +138,25 @@ class CouponSerializer(serializers.ModelSerializer):
     class Meta:
         model = Coupon
         fields = '__all__'
+
+# from django.db.models import Count
+
+
+# class DynamicSerializer:
+#     def __init__(self, model):
+#         self.model = model
+
+#     def generate(self, fields, _for, main):
+#         fields.append(main)
+#         discussions_count = f"{main.lower()}_count"
+#         fields.append(discussions_count)
+
+#         return type("DynamicSerializer", (serializers.ModelSerializer,), {
+#             f"{main}": serializers.PrimaryKeyRelatedField(queryset=_for.objects.all()),
+#             discussions_count: serializers.SerializerMethodField(),
+#             "Meta": type('Meta', (), {'model': _for, 'fields': fields})
+#         })
+
+#     def get_discussions_count(self, obj):
+#         # Assuming the ForeignKey field is named 'discussion_set'
+#         return obj.discussion_set.count()

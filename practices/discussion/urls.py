@@ -3,7 +3,7 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('read_aloud/<str:id>/discussions', ReadAloudDiscussionListView.as_view()),
+    # path('read_aloud/<str:id>/discussions', ReadAloudDiscussionListView.as_view()),
     path('highlight_summary/<str:id>/discussions', HighlightSummaryDiscussionListView.as_view()),
     path('summarize/<str:id>/discussions', SummarizeDiscussionListView.as_view()),
     path('multi_choice/<str:id>/discussions', MultiChoiceDiscussionListView.as_view()),
@@ -12,5 +12,6 @@ urlpatterns = [
     path('discussion', DiscussionCreateView.as_view()),
     path('<model>/discussion', DiscussionAdd.as_view()),
     path('discussion/<int:id>/like', LikeDiscussion.as_view()),
-    path('discussion/<int:id>', DiscussionDelete.as_view())
+    path('discussion/<int:id>', DiscussionDelete.as_view()),
+    path('<model>/<int:id>/discussions', DiscussionListView.as_view())
 ]

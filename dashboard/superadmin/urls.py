@@ -16,4 +16,5 @@ urlpatterns = [
     path("adminuser/<int:id>", DeleteAdminUserView.as_view()),
     path("coupon", CouponListCreateAPIView.as_view()),
     path("coupon/<int:pk>", CouponRetrieveUpdateDestroyAPIView.as_view()),
+    path("discussion/count", DiscussionCountView.as_view()),
 ]

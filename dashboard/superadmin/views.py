@@ -4,25 +4,33 @@ from django.http import Http404, JsonResponse
 from rest_framework import status
 from rest_framework.generics import (CreateAPIView, DestroyAPIView,
                                      GenericAPIView, ListAPIView,
-                                     UpdateAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView)
+                                     ListCreateAPIView,
+                                     RetrieveUpdateDestroyAPIView,
+                                     UpdateAPIView)
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import User
 from accounts.security.permission import IsSuperAdmin
+from practices.blank.models import Blank, RWBlank
+from practices.describe_image.models import DescribeImage
 from practices.dictation.models import Dictation
+from practices.discussion.models import Discussion
+from practices.highlight_incorrect_word.models import HighlightIncorrectWord
 from practices.highlight_summary.models import HighlightSummary
 from practices.missing_word.models import MissingWord
-from practices.multi_choice.models import MultiChoice
+from practices.multi_choice.models import MultiChoice, MultiChoiceReading
 from practices.read_aloud.models import ReadAloud
+from practices.reorder_paragraph.models import ReorderParagraph
 from practices.repeat_sentence.models import RepeatSentence
 from practices.retell_sentence.models import RetellSentence
-from practices.summarize.models import Summarize
+from practices.short_question.models import ShortQuestion
+from practices.summarize.models import Summarize, SummarizeSpoken
 from practices.write_easy.models import WriteEasy
 from utils.pagination import CustomPagination
 
-from .models import StudyMaterial, Coupon
+from .models import Coupon, StudyMaterial
 from .serializers import *
 
 
@@ -182,8 +190,62 @@ class CouponRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     lookup_field = 'pk'
 
 
+class DiscussionCountView(APIView):
+    def get(self, request, *args, **kwargs):
+        query = {
+            "read_aloud": Discussion.objects.filter(read_aloud__id__isnull=False).count(),
+            "highlight_summary": Discussion.objects.filter(highlight_summary__id__isnull=False).count(),
+            "summarize_written": Discussion.objects.filter(summarize__id__isnull=False).count(),
+            "summarize_spoken": Discussion.objects.filter(summarize_spoken__id__isnull=False).count(),
+            "multi_choice_single_answer": Discussion.objects.filter(multi_choice__id__isnull=False, multi_choice__single=True).count(),
+            "multi_choice_multi_answer": Discussion.objects.filter(multi_choice__id__isnull=False, multi_choice__single=False).count(),
+            "multi_choice_reading_single_answer": Discussion.objects.filter(multi_choice_reading__id__isnull=False, multi_choice_reading__single=True).count(),
+            "multi_choice_reading_multi_answer": Discussion.objects.filter(multi_choice_reading__id__isnull=False, multi_choice_reading__single=False).count(),
+            "missing_word": Discussion.objects.filter(missing_word__id__isnull=False).count(),
+            "dictation": Discussion.objects.filter(dictation__id__isnull=False).count(),
+            "blank": Discussion.objects.filter(blank__id__isnull=False).count(),
+            "read_write_blank": Discussion.objects.filter(read_write_blank__id__isnull=False).count(),
+            "describe_image": Discussion.objects.filter(describe_image__id__isnull=False).count(),
+            "highlight_incorrect_word": Discussion.objects.filter(highlight_incorrect_word__id__isnull=False).count(),
+            "reorder_paragraph": Discussion.objects.filter(reorder_paragraph__id__isnull=False).count(),
+            "repeat_sentence": Discussion.objects.filter(repeat_sentence__id__isnull=False).count(),
+            "retell_sentence": Discussion.objects.filter(retell_sentence__id__isnull=False).count(),
+            "short_question": Discussion.objects.filter(short_question__id__isnull=False).count(),
+            "write_easy": Discussion.objects.filter(write_easy__id__isnull=False).count()
+        }
+        return JsonResponse(query)
 
+# _models = {
+#     "read_aloud": ReadAloud,
+#     "highlight_summary": HighlightSummary,
+#     "summarize": Summarize,
+#     "summarize_spoken": SummarizeSpoken,
+#     "multi_choice": MultiChoice,
+#     "multi_choice_reading": MultiChoiceReading,
+#     "missing_word": MissingWord,
+#     "dictation": Dictation,
+#     "blank": Blank,
+#     "read_write_blank": RWBlank,
+#     "describe_image": DescribeImage,
+#     "highlight_incorrect_word": HighlightIncorrectWord,
+#     "reorder_paragraph": ReorderParagraph,
+#     "repeat_sentence": RepeatSentence,
+#     "retell_sentence": RetellSentence,
+#     "short_question": ShortQuestion,
+#     "write_easy": WriteEasy
+# }
 
-
-
-
+# class ModelWiseDiscussion(APIView):
+#     permission_classes = [IsStudentPermission]
+#     def post(self, request, *args, **kwargs):
+#         model = self.kwargs.get('model')
+#         fields = ['body', 'images', 'parent']
+#         _for = _models.get(model)
+#         if _for is None:
+#             raise Http404
+#         serializer = ds.generate(fields, _for, model)(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save(user=self.request.user)
+#             return Response(serializer.data)
+#         else:
+#             return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
