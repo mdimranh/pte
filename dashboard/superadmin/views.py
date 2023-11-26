@@ -5,11 +5,13 @@ from rest_framework import status
 from rest_framework.generics import (CreateAPIView, DestroyAPIView,
                                      GenericAPIView, ListAPIView,
                                      ListCreateAPIView,
-                                     RetrieveUpdateDestroyAPIView,
+                                     RetrieveUpdateDestroyAPIView, RetrieveDestroyAPIView,
                                      UpdateAPIView)
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from .serializers import OrganizationDetailsSerializer
 
 from accounts.models import User
 from accounts.security.permission import IsSuperAdmin
@@ -138,6 +140,12 @@ class OrgRegistrationView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         return Response(OrganizationSerializer(user, context=self.get_serializer_context()).data)
+
+class OrganizationRetriveDestroyApiView(RetrieveDestroyAPIView):
+    lookup_field = "pk"
+    queryset = User.objects.filter(is_organization=True)
+    serializer_class = OrganizationDetailsSerializer
+    permission_classes = [IsSuperAdmin | IsAdminUser]
 
 class OrganizationUpdateApiView(APIView):
     permission_classes = [IsAdminUser]

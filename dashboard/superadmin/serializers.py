@@ -4,7 +4,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from accounts.models import User
-from management.models import Profile
+from management.models import Group, Plan, Profile, Purchase
+from management.serializers import PlanSerializer
 
 from .models import *
 
@@ -169,3 +170,28 @@ class PromoBannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = PromoBanner
         fields = '__all__'
+
+
+class ProfileDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['org_name', 'country']
+
+class PurchaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Plan
+        fields=['title', 'description', 'start_date', 'end_date', 'thumbnail']
+
+class OrganizationDetailsSerializer(serializers.ModelSerializer):
+    profile = ProfileDetailsSerializer(many=True)
+    plans = serializers.SerializerMethodField()
+    class Meta:
+        model = User
+        fields = ["id", "full_name", "email", "phone", "picture", "profile", "plans"]
+
+    def get_plans(self, obj):
+        plans_queryset = Purchase.objects.filter(organization=obj).values('id')
+        plans = Plan.objects.filter(id__in=plans_queryset)
+        serializer = PurchaseSerializer(data=plans, many=True)
+        serializer.is_valid()
+        return serializer.data
