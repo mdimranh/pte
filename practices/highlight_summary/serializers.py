@@ -7,9 +7,9 @@ from .models import HighlightSummary
 
 class HighlightSummarySerializer(serializers.ModelSerializer):
     def validate(self, attrs):
-        if attrs.get('right_option') is not None and attrs.get('options') is not None:
-            if  attrs.get('right_option') not in attrs.get('options'):
-                raise serializers.ValidationError({"right_option": ["right_option not in options"]})
+        options = [option['value'] for option in attrs.get('options')]
+        if attrs.get('right_option') not in options:
+            raise serializers.ValidationError({"right_option": ["right_option not in options"]})
         return attrs
 
     class Meta:
@@ -52,5 +52,7 @@ class HighlightSummaryAnswerListSerializer(serializers.ModelSerializer):
         model = Answer
         fields = [
             "user",
-            "score"
+            "score",
+            "max_score",
+            "created_at"
         ]

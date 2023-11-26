@@ -1,4 +1,4 @@
-# Django #
+                  # Django #
 *.log
 *.pot
 *.pyc
@@ -113,7 +113,8 @@ env/
 venv/ 
 ENV/ 
 env.bak/ 
-venv.bak/ 
+venv.bak/
+newenv 
 
 # mkdocs documentation 
 /site 

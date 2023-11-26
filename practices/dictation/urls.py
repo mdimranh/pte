@@ -4,6 +4,7 @@ from .views import *
 
 urlpatterns = [
     path('dictation', DictationCreateAPIView.as_view()),
+    path('dictation/<int:id>/update', DictationUpdateAPIView.as_view()),
     path('dictations', DictationListAPIView.as_view()),
     path('dictation/<int:pk>', DictationDetailsView.as_view()),
     path('dictation/<int:pk>/answer', DictationAnswerListView.as_view()),

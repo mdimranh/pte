@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.generics import (CreateAPIView, ListAPIView,
-                                     ListCreateAPIView, RetrieveAPIView)
-from rest_framework.permissions import IsAuthenticated
+                                     ListCreateAPIView, RetrieveAPIView, UpdateAPIView)
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from accounts.security.permission import IsStudentPermission
 from ..discussion.views import CustomPagination
 from .models import Dictation
 from .serializers import *
@@ -17,10 +17,15 @@ class DictationListAPIView(ListAPIView):
     pagination_class = CustomPagination
 
 class DictationCreateAPIView(CreateAPIView):
+    permission_classes = [IsAdminUser]
     queryset = Dictation.objects.all()
     serializer_class = DictationSerializer
-    pagination_class = CustomPagination
 
+class DictationUpdateAPIView(UpdateAPIView):
+    lookup_field = "id"
+    permission_classes = [IsAdminUser]
+    queryset = Dictation.objects.all()
+    serializer_class = DictationSerializer
 
 class DictationDetailsView(RetrieveAPIView):
     lookup_field = "pk"
@@ -57,7 +62,7 @@ def get_score(self, sentence1, sentence2):
         return result
 
 class DictationAnswerCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsStudentPermission]
         
     def post(self, request):
         serializer = DictationAnswerCreateSerializer(data=request.data)
@@ -67,6 +72,7 @@ class DictationAnswerCreateView(APIView):
             return Response({
                 "score": score.get('score'),
                 "detail_answer": score.get('words'),
+                "max_score": len(serializer.validated_data['dictation'].content.split(" "))
             })
         else:
             return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
@@ -81,7 +87,7 @@ class DictationAnswerListView(ListAPIView):
 
 class MyAnswerListView(ListAPIView):
     serializer_class = DictationAnswerListSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsStudentPermission,)
     def get_queryset(self):
         # Get the primary key (pk) from the URL query parameters
         pk = self.kwargs.get('pk')

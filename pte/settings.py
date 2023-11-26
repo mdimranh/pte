@@ -14,10 +14,14 @@ SECRET_KEY = 'django-insecure-6q!66!dp%5$(cg3o^%#!1ek=_3t+(qjf&3e3i6vwmm6zk(w(d7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "3.110.151.3", "ip-172-31-10-105.ap-south-1.compute.internal"]
+ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = ['https://api.codebyamirus.link']
 
 
 # Application definition
+
+USE_X_FORWARDED_HOST = True 
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https") 
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
@@ -32,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'practices',
     'practices.read_aloud',
     'practices.discussion',
     'practices.answer',
@@ -39,6 +44,22 @@ INSTALLED_APPS = [
     'practices.highlight_summary',
     'practices.multi_choice',
     'practices.missing_word',
+    'practices.dictation',
+    'practices.write_easy',
+    'practices.repeat_sentence',
+    'practices.retell_sentence',
+    'practices.short_question',
+    'practices.describe_image',
+    'practices.reorder_paragraph',
+    'practices.highlight_incorrect_word',
+    'practices.blank',
+
+    'mocktest',
+
+    'dashboard.superadmin',
+    'dashboard.student',
+
+    'management',
 
     'corsheaders',
 
@@ -135,7 +156,8 @@ AUTHENTICATION_BACKENDS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'EXCEPTION_HANDLER': 'utils.exception_handler.handle_exception'
 }
 
 REST_AUTH = {
@@ -178,6 +200,12 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Base url to serve media files
+MEDIA_URL = '/media/'
+
+# Path where media is stored'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 
 # Storage configuration
 # AWS_ACCESS_KEY_ID = 'AKIAQ2VTJQTMJ2ADEKE5 '
@@ -199,7 +227,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # simple jwt configuration
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,

@@ -4,6 +4,7 @@ from .views import *
 
 urlpatterns = [
     path('missing_word', MissingWordCreateAPIView.as_view()),
+    path('missing_word/<int:id>/update', MissingWordUpdateAPIView.as_view()),
     path('missing_words', MissingWordListAPIView.as_view()),
     path('missing_word/<int:pk>', MissingWordDetailsView.as_view()),
     path('missing_word/<int:pk>/answer', MissingWordAnswerListView.as_view()),
