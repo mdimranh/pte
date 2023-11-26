@@ -2,17 +2,16 @@ from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         PermissionsMixin)
 from django.core.mail import send_mail
 from django.db import models
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
 from django.utils import timezone
 # from django.utils.http import urlquote
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
-from django.db.models.signals import post_delete, post_save
-from django.dispatch import receiver
-
 
 class CustomUserManager(BaseUserManager):
-    def _create_user(self, email, phone, password, is_staff, is_superuser, **extra_fields):
+    def _create_user(self, email, phone, password, is_student, is_organization, is_staff, is_superuser, **extra_fields):
         now = timezone.now()
 
         if not email:
@@ -22,7 +21,10 @@ class CustomUserManager(BaseUserManager):
         user = self.model(
                 email=email,
                 phone=phone,
-                is_staff=is_staff, is_active=True,
+                is_student=is_student,
+                is_organization=is_organization,
+                is_staff=is_staff,
+                is_active=True,
                 is_superuser=is_superuser,
                 last_login=now,
                 date_joined=now,
@@ -32,18 +34,21 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_user(self, email, phone=None, password=None, **extra_fields):
-        return self._create_user(email, phone, password, False, False, **extra_fields)
+    def create_user(self, email, phone=None, password=None, is_student=False, is_organization=False, is_staff=False, **extra_fields):
+        return self._create_user(email, phone, password, is_student, is_organization, is_staff, False, **extra_fields)
 
     def create_superuser(self, email, phone, password, **extra_fields):
-        return self._create_user(email, phone, password, True, True, **extra_fields)
+        return self._create_user(email, phone, password, False, False, True, True, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
-    phone = PhoneNumberField(unique=True)
+    phone = PhoneNumberField(unique=True, blank=True, null=True)
     full_name = models.CharField(max_length=255, blank=True)
-    picture = models.ImageField(upload_to="media/user")
+    image = models.ImageField(upload_to="media/user", blank=True, null=True)
+    image_url = models.TextField(blank=True, null=True)
     date_joined = models.DateTimeField(_('date joined'), auto_now=True)
+    is_student   = models.BooleanField(default=False)
+    is_organization   = models.BooleanField(default=False)
     is_active   = models.BooleanField(default=True)
     is_admin    = models.BooleanField(default=False)
     is_staff    = models.BooleanField(default=False)
@@ -59,6 +64,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     # def get_absolute_url(self):
     #     return "/users/%s/" % urlquote(self.email)
+    @property
+    def picture(self):
+        if self.image_url:
+            return self.image_url
+        if self.image:
+            return self.image.url
+        return None
+
 
     def get_full_name(self):
         return self.full_name
@@ -66,10 +79,21 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.full_name
 
-    # def email_user(self, subject, message, from_email=None):
-    #     send_mail(subject, message, from_email, [self.email])
+PROVIDERS = [
+    ("facebook", "Facebook"),
+    ("google", "Google"),
+    ("apple", "Apple")
+]
+
+class SocialAccount(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    provider = models.CharField(max_length = 20, choices=PROVIDERS)
+    uid = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
 
 @receiver(post_delete, sender=User)
-def delete_file(sender, instance, created, **kwargs):
-    if instance.picture:
-        instance.picture.delete(False)
+def delete_file(sender, instance, **kwargs):
+    if instance.image:
+        instance.image.delete(False)
