@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.generics import (CreateAPIView, ListAPIView,
-                                     ListCreateAPIView, RetrieveAPIView)
+                                     ListCreateAPIView, RetrieveAPIView, UpdateAPIView)
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -21,8 +21,12 @@ class RepeatSentenceCreateAPIView(CreateAPIView):
     permission_classes = [IsAdminUser]
     queryset = RepeatSentence.objects.all()
     serializer_class = RepeatSentenceSerializer
-    pagination_class = CustomPagination
 
+class RepeatSentenceUpdateAPIView(UpdateAPIView):
+    lookup_field = 'id'
+    permission_classes = [IsAdminUser]
+    queryset = RepeatSentence.objects.all()
+    serializer_class = RepeatSentenceSerializer
 
 class RepeatSentenceDetailsView(RetrieveAPIView):
     lookup_field = "pk"

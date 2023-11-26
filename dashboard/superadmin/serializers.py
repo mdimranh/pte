@@ -6,7 +6,7 @@ from rest_framework.exceptions import ValidationError
 from accounts.models import User
 from management.models import Profile
 
-from .models import Coupon, StudyMaterial
+from .models import *
 
 
 class SuperAdminCreateSerializer(serializers.Serializer):
@@ -139,24 +139,33 @@ class CouponSerializer(serializers.ModelSerializer):
         model = Coupon
         fields = '__all__'
 
-# from django.db.models import Count
+
+class DynamicSerializer:
+    def __init__(self, model):
+        self.model = model
+
+    def generate(self, fields, _for, main):
+        fields.append("discussions_count")
+        fields.append("last_discussion_date")
+
+        return type("DynamicSerializer", (serializers.ModelSerializer,), {
+            "discussions_count": serializers.SerializerMethodField(),
+            "last_discussion_date": serializers.SerializerMethodField(),
+            "Meta": type('Meta', (), {'model': _for, 'fields': fields}),
+            "get_discussions_count": self.get_discussions_count,
+            "get_last_discussion_date": self.get_last_discussion_date,
+        })
+
+    def get_discussions_count(self, obj):
+        return obj.discussion.count()
+
+    def get_last_discussion_date(self, obj):
+        discussion = obj.discussion.last()
+        if discussion is not None:
+            return discussion.created_at
 
 
-# class DynamicSerializer:
-#     def __init__(self, model):
-#         self.model = model
-
-#     def generate(self, fields, _for, main):
-#         fields.append(main)
-#         discussions_count = f"{main.lower()}_count"
-#         fields.append(discussions_count)
-
-#         return type("DynamicSerializer", (serializers.ModelSerializer,), {
-#             f"{main}": serializers.PrimaryKeyRelatedField(queryset=_for.objects.all()),
-#             discussions_count: serializers.SerializerMethodField(),
-#             "Meta": type('Meta', (), {'model': _for, 'fields': fields})
-#         })
-
-#     def get_discussions_count(self, obj):
-#         # Assuming the ForeignKey field is named 'discussion_set'
-#         return obj.discussion_set.count()
+class PromoBannerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PromoBanner
+        fields = '__all__'

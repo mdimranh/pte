@@ -4,6 +4,7 @@ from .views import *
 
 urlpatterns = [
     path('repeat_sentence', RepeatSentenceCreateAPIView.as_view()),
+    path('repeat_sentence/<int:id>/update', RepeatSentenceUpdateAPIView.as_view()),
     path('repeat_sentences', RepeatSentenceListAPIView.as_view()),
     path('repeat_sentence/<int:pk>', RepeatSentenceDetailsView.as_view()),
     path('repeat_sentence/<int:pk>/answer', RepeatSentenceAnswerListView.as_view()),

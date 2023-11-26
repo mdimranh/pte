@@ -21,20 +21,18 @@ import math
 import difflib
 import wave
 from transformers import pipeline
-app = Flask(__name__)
 from collections import Counter
 recognizer = sr.Recognizer()
 from pyngrok import ngrok
-from flask import Flask, render_template, request
 import spacy
 from nltk.tokenize import word_tokenize
 import nltk
-import spacy
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import librosa
 import textdescriptives as td
-app = Flask(__name__)
+
+from pte import settings
 
 
 # Load necessary models and resources
@@ -45,14 +43,7 @@ nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 nlp = spacy.load('en_core_web_sm')
 nlp.add_pipe("textdescriptives/all")
-ngrok_url = ""
-# def start_ngrok():
-#     ngrok_tunnel = ngrok.connect(5000)  # Replace 5000 with your Flask app's port
-#     print("Ngrok Tunnel URL:", ngrok_tunnel.public_url)
 
-@app.route('/')
-def index():
-      return render_template("Read_Aloud.html")
 a=False
 score = False
 content_score = False
@@ -1701,3 +1692,13 @@ def Speech():
             a=reference
             reference=False
             return render_template('Speech.html',speech=a)
+
+
+reference=False
+def voiceAuthentication(audio):
+    global reference
+    pipe = pipeline("automatic-speech-recognition", model=os.path.join(settings.BASE_DIR, "Wav2Vec2"))
+    transcription = pipe(audio)
+    reference = transcription['text']
+    print(reference)
+    return reference

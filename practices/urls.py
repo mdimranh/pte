@@ -1,4 +1,5 @@
 from django.urls import include, path
+from .views import *
 
 urlpatterns = [
     path('practice/', include('practices.read_aloud.urls')),
@@ -16,4 +17,5 @@ urlpatterns = [
     path('', include('practices.describe_image.urls')),
     path('', include('practices.reorder_paragraph.urls')),
     path('', include('practices.blank.urls')),
+    path('audio_to_text', AudioToText.as_view()),
 ]

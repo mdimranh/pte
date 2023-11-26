@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from nltk.corpus import wordnet
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from accounts.security.permission import IsStudentPermission
 from rest_framework.views import APIView
@@ -27,6 +27,11 @@ class ReadAloudView(RetrieveAPIView):
 
 class ReadAloudCreateView(CreateAPIView):
     permission_classes = [IsAdminUser]
+    queryset = ReadAloud.objects.all()
+    serializer_class = ReadAloudSerializer
+
+class ReadAloudUpdateView(UpdateAPIView):
+    lookup_field = 'id'
     permission_classes = [IsAdminUser]
     queryset = ReadAloud.objects.all()
     serializer_class = ReadAloudSerializer

@@ -215,37 +215,46 @@ class DiscussionCountView(APIView):
         }
         return JsonResponse(query)
 
-# _models = {
-#     "read_aloud": ReadAloud,
-#     "highlight_summary": HighlightSummary,
-#     "summarize": Summarize,
-#     "summarize_spoken": SummarizeSpoken,
-#     "multi_choice": MultiChoice,
-#     "multi_choice_reading": MultiChoiceReading,
-#     "missing_word": MissingWord,
-#     "dictation": Dictation,
-#     "blank": Blank,
-#     "read_write_blank": RWBlank,
-#     "describe_image": DescribeImage,
-#     "highlight_incorrect_word": HighlightIncorrectWord,
-#     "reorder_paragraph": ReorderParagraph,
-#     "repeat_sentence": RepeatSentence,
-#     "retell_sentence": RetellSentence,
-#     "short_question": ShortQuestion,
-#     "write_easy": WriteEasy
-# }
+_models = {
+    "read_aloud": ReadAloud,
+    "highlight_summary": HighlightSummary,
+    "summarize": Summarize,
+    "summarize_spoken": SummarizeSpoken,
+    "multi_choice": MultiChoice,
+    "multi_choice_reading": MultiChoiceReading,
+    "missing_word": MissingWord,
+    "dictation": Dictation,
+    "blank": Blank,
+    "read_write_blank": RWBlank,
+    "describe_image": DescribeImage,
+    "highlight_incorrect_word": HighlightIncorrectWord,
+    "reorder_paragraph": ReorderParagraph,
+    "repeat_sentence": RepeatSentence,
+    "retell_sentence": RetellSentence,
+    "short_question": ShortQuestion,
+    "write_easy": WriteEasy
+}
 
-# class ModelWiseDiscussion(APIView):
-#     permission_classes = [IsStudentPermission]
-#     def post(self, request, *args, **kwargs):
-#         model = self.kwargs.get('model')
-#         fields = ['body', 'images', 'parent']
-#         _for = _models.get(model)
-#         if _for is None:
-#             raise Http404
-#         serializer = ds.generate(fields, _for, model)(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save(user=self.request.user)
-#             return Response(serializer.data)
-#         else:
-#             return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+class ModelWiseDiscussion(APIView):
+    # permission_classes = [IsSuperAdmin]
+    def get(self, request, *args, **kwargs):
+        model = self.kwargs.get('model')
+        fields = ['id', 'title']
+        _for = _models.get(model)
+        if _for is None:
+            raise Http404
+        datas = _for.objects.all()
+        serializer_class = DynamicSerializer(_for).generate(fields, _for, model)
+        serializer = serializer_class(instance=datas, many=True)
+        return Response(serializer.data)
+
+class PromoBannerView(ListCreateAPIView):
+    permission_classes = [IsAdminUser | IsSuperAdmin]
+    serializer_class = PromoBannerSerializer
+    queryset = PromoBanner.objects.all()
+
+class PromoBannerRUDView(RetrieveUpdateDestroyAPIView):
+    lookup_field = 'id'
+    permission_classes = [IsAdminUser | IsSuperAdmin]
+    serializer_class = PromoBannerSerializer
+    queryset = PromoBanner.objects.all()

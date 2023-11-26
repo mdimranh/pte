@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.generics import (CreateAPIView, ListAPIView,
-                                     ListCreateAPIView, RetrieveAPIView)
+                                     ListCreateAPIView, RetrieveAPIView, UpdateAPIView)
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -22,8 +22,12 @@ class ReorderParagraphCreateAPIView(CreateAPIView):
     permission_classes = [IsAdminUser]
     queryset = ReorderParagraph.objects.all()
     serializer_class = ReorderParagraphSerializer
-    pagination_class = CustomPagination
 
+class ReorderParagraphUpdateAPIView(UpdateAPIView):
+    lookup_field = "id"
+    permission_classes = [IsAdminUser]
+    queryset = ReorderParagraph.objects.all()
+    serializer_class = ReorderParagraphSerializer
 
 class ReorderParagraphDetailsView(RetrieveAPIView):
     lookup_field = "pk"

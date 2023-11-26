@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.generics import (CreateAPIView, ListAPIView,
-                                     ListCreateAPIView, RetrieveAPIView)
+                                     ListCreateAPIView, RetrieveAPIView, UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -19,8 +19,12 @@ class HighlightSummaryCreateAPIView(CreateAPIView):
     permission_classes = [IsAdminUser]
     queryset = HighlightSummary.objects.all()
     serializer_class = HighlightSummarySerializer
-    pagination_class = CustomPagination
 
+class HighlightSummaryUpdateAPIView(UpdateAPIView):
+    lookup_field = 'id'
+    permission_classes = [IsAdminUser]
+    queryset = HighlightSummary.objects.all()
+    serializer_class = HighlightSummarySerializer
 
 class HighlightSummaryDetailsView(RetrieveAPIView):
     lookup_field = "pk"

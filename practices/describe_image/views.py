@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.generics import (CreateAPIView, ListAPIView,
-                                     ListCreateAPIView, RetrieveAPIView)
+                                     ListCreateAPIView, RetrieveAPIView, UpdateAPIView)
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -21,8 +21,12 @@ class DescribeImageCreateAPIView(CreateAPIView):
     permission_classes = [IsAdminUser]
     queryset = DescribeImage.objects.all()
     serializer_class = DescribeImageSerializer
-    pagination_class = CustomPagination
 
+class DescribeImageUpdateAPIView(UpdateAPIView):
+    lookup_field = 'id'
+    permission_classes = [IsAdminUser]
+    queryset = DescribeImage.objects.all()
+    serializer_class = DescribeImageSerializer
 
 class DescribeImageDetailsView(RetrieveAPIView):
     lookup_field = "pk"

@@ -6,12 +6,12 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-
+from management.models import Purchase
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User, SocialAccount
 from .serializers import *
-
+from django.utils import timezone
 
 class RegistrationView(GenericAPIView):
     serializer_class = RegistrationSerializer
@@ -38,9 +38,12 @@ class SocialRegistration(GenericAPIView):
             user.image_url = serializer.validated_data['image_url']
             user.full_name = serializer.validated_data['full_name']
             user.email = serializer.validated_data['email']
+            user.last_login = timezone.now()
             user.save()
         else:
             user = serializer.save()
+            user.last_login = timezone.now()
+            user.save()
         refresh = RefreshToken.for_user(user)
         return Response(
             {
@@ -110,6 +113,24 @@ class UserProfileUpload(APIView):
             return Response({
                 'error': 'No picture provided'
             }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+
+class GetRoleApi(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        premium = {}
+        if request.user.is_admin:
+            role = "super_admin"
+        elif request.user.is_staff:
+            role = "admin"
+        elif request.user.is_student:
+            premium = {"premium": Purchase.objects.filter(student=request.user).exists()}
+            role = "student"
+        elif request.user.is_organization:
+            role = "organization"
+        return Response({
+            "role": role, **premium
+        })
 
 class Home(APIView):
     def get(self, request):

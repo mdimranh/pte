@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.generics import (CreateAPIView, ListAPIView,
-                                     ListCreateAPIView, RetrieveAPIView)
+                                     ListCreateAPIView, RetrieveAPIView, UpdateAPIView)
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from accounts.security.permission import IsStudentPermission
 
 from ..discussion.views import CustomPagination
-from .models import Blank, RWBlank
+from .models import Blank, RWBlank, ReadingBlank
 from .serializers import *
 
 
@@ -22,8 +22,12 @@ class BlankCreateAPIView(CreateAPIView):
     permission_classes = [IsAdminUser]
     queryset = Blank.objects.all()
     serializer_class = BlankSerializer
-    pagination_class = CustomPagination
 
+class BlankUpdateAPIView(UpdateAPIView):
+    lookup_field = "id"
+    permission_classes = [IsAdminUser]
+    queryset = Blank.objects.all()
+    serializer_class = BlankSerializer
 
 class BlankDetailsView(RetrieveAPIView):
     lookup_field = "pk"
@@ -77,6 +81,31 @@ class MyAnswerListView(ListAPIView):
         return queryset
 
 
+# Reading Blank
+
+class ReadingBlankListAPIView(ListAPIView):
+    queryset = ReadingBlank.objects.filter()
+    serializer_class = ReadingBlankListSerializer
+    pagination_class = CustomPagination
+
+class ReadingBlankCreateAPIView(CreateAPIView):
+    permission_classes = [IsAdminUser]
+    queryset = ReadingBlank.objects.all()
+    serializer_class = ReadingBlankSerializer
+
+
+class ReadingBlankUpdateAPIView(UpdateAPIView):
+    lookup_field = "id"
+    permission_classes = [IsAdminUser]
+    queryset = ReadingBlank.objects.all()
+    serializer_class = ReadingBlankSerializer
+
+
+class ReadingBlankDetailsView(RetrieveAPIView):
+    lookup_field = "pk"
+    serializer_class = ReadingBlankDetailsSerializer
+    queryset = ReadingBlank.objects.all()
+
 # RWBlank
 
 class RWBlankListAPIView(ListAPIView):
@@ -85,6 +114,13 @@ class RWBlankListAPIView(ListAPIView):
     pagination_class = CustomPagination
 
 class RWBlankCreateAPIView(CreateAPIView):
+    permission_classes = [IsAdminUser]
+    queryset = RWBlank.objects.all()
+    serializer_class = RWBlankSerializer
+    pagination_class = CustomPagination
+
+class RWBlankUpdateAPIView(UpdateAPIView):
+    lookup_field = 'id'
     permission_classes = [IsAdminUser]
     queryset = RWBlank.objects.all()
     serializer_class = RWBlankSerializer

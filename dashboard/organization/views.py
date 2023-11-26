@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 
 from accounts.models import User
 from accounts.security.permission import (IsOrganizationPermission,
-                                          IsStudentPermission)
+                                          IsStudentPermission, IsSuperAdmin)
 from accounts.serializers import UserCreateSerializer, UserDetailsSerializer
 from management.models import Group, Purchase
 from utils.pagination import CustomPagination
@@ -152,11 +152,16 @@ class ExamCalenderView(ListAPIView):
     queryset = ExamCountdown.objects.filter(exam_date__gte = timezone.now())
 
 class StudentDataCounts(APIView):
-    permission_classes = (IsStudentPermission,)
+    permission_classes = [IsOrganizationPermission | IsAdminUser | IsSuperAdmin]
     def get(self, request):
-        total_student = User.objects.filter(profile__organization = request.user).count()
-        premium_student = Purchase.objects.filter(organization=request.user).aggregate(total_students=Count('student')).get('total_students')
-        total_max_accounts = Purchase.objects.filter(organization=request.user).aggregate(total_max_accounts=Sum('plan__maximum_accounts')).get('total_max_accounts')
+        if request.user.is_organization:
+            total_student = User.objects.filter(profile__organization = request.user).count()
+            premium_student = Purchase.objects.filter(organization=request.user).aggregate(total_students=Count('student')).get('total_students')
+            total_max_accounts = Purchase.objects.filter(organization=request.user).aggregate(total_max_accounts=Sum('plan__maximum_accounts')).get('total_max_accounts')
+        else:
+            total_student = User.objects.all().count()
+            premium_student = Purchase.objects.all().aggregate(total_students=Count('student')).get('total_students')
+            total_max_accounts = Purchase.objects.all().aggregate(total_max_accounts=Sum('plan__maximum_accounts')).get('total_max_accounts')
         total_student = 0 if total_student is None else total_student
         premium_student = 0 if premium_student is None else premium_student
         total_max_accounts = 0 if total_max_accounts is None else total_max_accounts
@@ -173,12 +178,15 @@ class StudentDataCounts(APIView):
         })
 
 class RecentJoinedStudentList(ListAPIView):
-    permission_classes = [IsOrganizationPermission]
+    permission_classes = [IsOrganizationPermission | IsAdminUser | IsSuperAdmin]
     serializer_class = StudentListSerializer
     pagination_class = CustomPagination
 
     def get_queryset(self):
-        queryset = User.objects.filter(profile__organization=self.request.user, date_joined__gte=timezone.now() - timedelta(days=30))
+        if self.request.user.is_organization: 
+            queryset = User.objects.filter(profile__organization=self.request.user, date_joined__gte=timezone.now() - timedelta(days=30))
+        elif self.request.user.is_admin or self.request.user.is_staff: 
+            queryset = User.objects.filter(is_student=True, date_joined__gte=timezone.now() - timedelta(days=30))
         return queryset
     
     

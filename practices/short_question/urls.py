@@ -4,6 +4,7 @@ from .views import *
 
 urlpatterns = [
     path('short_question', ShortQuestionCreateAPIView.as_view()),
+    path('short_question/<int:id>/update', ShortQuestionUpdateAPIView.as_view()),
     path('short_questions', ShortQuestionListAPIView.as_view()),
     path('short_question/<int:pk>', ShortQuestionDetailsView.as_view()),
     path('short_question/<int:pk>/answer', ShortQuestionAnswerListView.as_view()),

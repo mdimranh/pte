@@ -31,3 +31,10 @@ class Coupon(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+class PromoBanner(models.Model):
+    title = models.TextField()
+    link = models.URLField()
+    show_after = models.IntegerField()
+    image = models.ImageField(upload_to="promo_banner")
+    active = models.BooleanField(default=True)

@@ -28,6 +28,35 @@ class Blank(models.Model):
     appeared = models.IntegerField(default=0)
 
 
+schema = {
+    "type" : "list",
+    "properties" : {
+        "index": {
+            "type": "string"
+        },
+        "value": {
+            "type": "string"
+        },
+        "type": "object"
+    },
+}
+
+class ReadingBlank(models.Model):
+    title = models.TextField()
+    sentence = ArrayField(models.TextField())
+    answers = jsonField(schema=schema, validators=[JsonValidator])
+    extra_answers = jsonField(schema=schema, validators=[JsonValidator])
+    bookmark = models.ManyToManyField(User, blank=True, related_name='reading_blank_bookmark')
+    prediction = models.BooleanField(default=False)
+    appeared = models.IntegerField(default=0)
+
+    @property
+    def option_list(self):
+        options = self.options
+        for option in options:
+            del option['answer']
+        return options
+
 rwb_schema = {
     "type" : "list",
     "properties" : {

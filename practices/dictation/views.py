@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.generics import (CreateAPIView, ListAPIView,
-                                     ListCreateAPIView, RetrieveAPIView)
+                                     ListCreateAPIView, RetrieveAPIView, UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -20,8 +20,12 @@ class DictationCreateAPIView(CreateAPIView):
     permission_classes = [IsAdminUser]
     queryset = Dictation.objects.all()
     serializer_class = DictationSerializer
-    pagination_class = CustomPagination
 
+class DictationUpdateAPIView(UpdateAPIView):
+    lookup_field = "id"
+    permission_classes = [IsAdminUser]
+    queryset = Dictation.objects.all()
+    serializer_class = DictationSerializer
 
 class DictationDetailsView(RetrieveAPIView):
     lookup_field = "pk"

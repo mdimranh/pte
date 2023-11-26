@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.generics import (CreateAPIView, ListAPIView,
-                                     ListCreateAPIView, RetrieveAPIView)
+                                     ListCreateAPIView, RetrieveAPIView, UpdateAPIView)
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -27,8 +27,12 @@ class MultiChoiceCreateAPIView(CreateAPIView):
     permission_classes = [IsAdminUser]
     queryset = MultiChoice.objects.all()
     serializer_class = MultiChoiceSerializer
-    pagination_class = CustomPagination
 
+class MultiChoiceUpdateAPIView(UpdateAPIView):
+    lookup_field = 'id'
+    permission_classes = [IsAdminUser]
+    queryset = MultiChoice.objects.all()
+    serializer_class = MultiChoiceSerializer
 
 class MultiChoiceDetailsView(RetrieveAPIView):
     lookup_field = "pk"
@@ -104,8 +108,12 @@ class MultiChoiceReadingCreateAPIView(CreateAPIView):
     permission_classes = [IsAdminUser]
     queryset = MultiChoiceReading.objects.all()
     serializer_class = MultiChoiceReadingSerializer
-    pagination_class = CustomPagination
 
+class MultiChoiceReadingUpdateAPIView(UpdateAPIView):
+    lookup_field = 'id'
+    permission_classes = [IsAdminUser]
+    queryset = MultiChoiceReading.objects.all()
+    serializer_class = MultiChoiceReadingSerializer
 
 class MultiChoiceReadingDetailsView(RetrieveAPIView):
     lookup_field = "pk"

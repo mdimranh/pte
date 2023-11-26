@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Blank, RWBlank
+from .models import Blank, RWBlank, ReadingBlank
 from ..answer.models import Answer
 from ..discussion.serializers import UserSerializer
 
@@ -46,8 +46,6 @@ class BlankAnswerListSerializer(serializers.ModelSerializer):
 
 
 # RWBlank
-
-
 class RWBlankSerializer(serializers.ModelSerializer):
     class Meta:
         model = RWBlank
@@ -64,6 +62,28 @@ class RWBlankDetailsSerializer(serializers.ModelSerializer):
 class RWBlankListSerializer(serializers.ModelSerializer):
     class Meta:
         model = RWBlank
+        fields = [
+            "id", "title", "appeared", "prediction"
+        ]
+
+
+# Reading Blank
+
+class ReadingBlankSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReadingBlank
+        fields = '__all__'
+
+class ReadingBlankDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReadingBlank
+        fields = [
+            "id", "title", "sentence", "appeared", "prediction"
+        ]
+
+class ReadingBlankListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReadingBlank
         fields = [
             "id", "title", "appeared", "prediction"
         ]

@@ -17,4 +17,7 @@ urlpatterns = [
     path("coupon", CouponListCreateAPIView.as_view()),
     path("coupon/<int:pk>", CouponRetrieveUpdateDestroyAPIView.as_view()),
     path("discussion/count", DiscussionCountView.as_view()),
+    path("<model>/questions", ModelWiseDiscussion.as_view()),
+    path("promo_banner", PromoBannerView.as_view()),
+    path("promo_banner/<int:id>", PromoBannerRUDView.as_view()),
 ]

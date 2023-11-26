@@ -4,6 +4,7 @@ from .views import *
 
 urlpatterns = [
     path('describe_image', DescribeImageCreateAPIView.as_view()),
+    path('describe_image/<int:id>/update', DescribeImageUpdateAPIView.as_view()),
     path('describe_images', DescribeImageListAPIView.as_view()),
     path('describe_image/<int:pk>', DescribeImageDetailsView.as_view()),
     path('describe_image/<int:pk>/answer', DescribeImageAnswerListView.as_view()),

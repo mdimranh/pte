@@ -3,14 +3,15 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.security.permission import IsStudentPermission
+from accounts.security.permission import IsStudentPermission, IsSuperAdmin, IsOrganizationPermission
+from rest_framework.permissions import IsAdminUser
 
 from .models import ExamCountdown, TargetScore
 from .serializers import ExamCountdownSerializer, TargetScoreSerializer
 
 
 class ExamCountdownView(APIView):
-    permission_classes = [IsStudentPermission]
+    permission_classes = [IsStudentPermission | IsOrganizationPermission | IsAdminUser | IsSuperAdmin]
     def get(self, request):
         get_countdown = ExamCountdown.objects.filter(student=request.user).first()
         if get_countdown:
@@ -41,7 +42,7 @@ class ExamCountdownView(APIView):
             return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 class TargetScoreView(APIView):
-    permission_classes = [IsStudentPermission]
+    permission_classes = [IsStudentPermission | IsOrganizationPermission | IsAdminUser | IsSuperAdmin]
     def get(self, request):
         get_target_score = TargetScore.objects.filter(student=request.user).first()
         if get_target_score:
