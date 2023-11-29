@@ -61,6 +61,8 @@ INSTALLED_APPS = [
 
     'management',
 
+    'payment',
+
     'corsheaders',
 
     'rest_framework',

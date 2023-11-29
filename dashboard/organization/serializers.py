@@ -83,7 +83,7 @@ class PurchaseSerializer(serializers.ModelSerializer):
         fields=['title', 'description', 'start_date', 'end_date', 'thumbnail']
 
 class StudentDetailsSerializer(serializers.ModelSerializer):
-    profile = ProfileDetailsSerializer(many=True)
+    profile = ProfileSerializer(many=True)
     plans = serializers.SerializerMethodField()
     class Meta:
         model = User
@@ -130,7 +130,7 @@ class StudentUpdateSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False)
     phone = PhoneNumberField(required=False)
     profile = UpdateProfileSerializer(required=False)
-    group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all())
+    group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), required=False)
     organization = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(is_organization=True), required=False)
 
     def create(self, validated_data):

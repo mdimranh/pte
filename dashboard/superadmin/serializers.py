@@ -135,6 +135,16 @@ class OrganizationUpdateSerializer(serializers.Serializer):
             return user
 
 
+class ChangePasswordSerializer(serializers.Serializer):
+    organization = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(is_organization=True))
+    my_password = serializers.CharField()
+    new_password = serializers.CharField()
+
+class ChangeUseridSerializer(serializers.Serializer):
+    organization = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(is_organization=True))
+    my_password = serializers.CharField()
+    userid = serializers.CharField()
+
 class CouponSerializer(serializers.ModelSerializer):
     class Meta:
         model = Coupon

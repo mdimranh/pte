@@ -4,7 +4,7 @@ from django.db import models
 from accounts.models import User
 
 # new
-from ..blank.models import Blank, RWBlank
+from ..blank.models import Blank, RWBlank, ReadingBlank
 from ..describe_image.models import DescribeImage
 from ..dictation.models import Dictation
 from ..highlight_incorrect_word.models import HighlightIncorrectWord
@@ -35,6 +35,7 @@ class Discussion(models.Model):
     missing_word = models.ForeignKey(MissingWord, blank=True, null=True, on_delete=models.CASCADE, related_name='discussion')
     dictation = models.ForeignKey(Dictation, blank=True, null=True, on_delete=models.CASCADE, related_name='discussion')
     blank = models.ForeignKey(Blank, blank=True, null=True, on_delete=models.CASCADE, related_name='discussion')
+    blank_reading = models.ForeignKey(ReadingBlank, blank=True, null=True, on_delete=models.CASCADE, related_name='discussion')
     read_write_blank = models.ForeignKey(RWBlank, blank=True, null=True, on_delete=models.CASCADE, related_name='discussion')
     describe_image = models.ForeignKey(DescribeImage, blank=True, null=True, on_delete=models.CASCADE, related_name='discussion')
     reorder_paragraph = models.ForeignKey(ReorderParagraph, blank=True, null=True, on_delete=models.CASCADE, related_name='discussion')

@@ -120,7 +120,7 @@ class ChangePassword(APIView):
 
 class GroupListView(ListAPIView):
     serializer_class = GroupSerializer
-    permission_classes = [IsOrganizationPermission]
+    permission_classes = [IsOrganizationPermission | IsAdminUser | IsSuperAdmin]
     def get_queryset(self):
         queryset = Group.objects.filter(organization__id=self.request.user.id)
         return queryset
@@ -135,12 +135,21 @@ class OrgGroupListView(ListAPIView):
     
 
 class GroupCreateView(GenericAPIView):
-    permission_classes = [IsOrganizationPermission]
+    permission_classes = [IsOrganizationPermission | IsAdminUser | IsSuperAdmin]
     serializer_class = GroupCreateSerializer
 
     def post(self, request, *args, **kwargs):
         data = request.data
-        data['organization'] = request.user.id
+        oid = request.GET.get('oid')
+        organization = User.objects.filter(id=oid).first()
+        if organization is None:
+            return Response({
+                "error": "Organization not found."
+            }, status=status.HTTP_404_NOT_FOUND)
+        if request.user.is_admin or request.user.is_staff:
+            data['organization'] = organization.id
+        else:
+            data['organization'] = request.user.id
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         group = serializer.save()
@@ -165,7 +174,6 @@ class StudentDataCounts(APIView):
         total_student = 0 if total_student is None else total_student
         premium_student = 0 if premium_student is None else premium_student
         total_max_accounts = 0 if total_max_accounts is None else total_max_accounts
-        print(total_student, premium_student)
         return Response({
             "total_student": total_student,
             "premium_student": premium_student,

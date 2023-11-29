@@ -33,8 +33,13 @@ class Coupon(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 class PromoBanner(models.Model):
-    title = models.TextField()
-    link = models.URLField()
-    show_after = models.IntegerField()
-    image = models.ImageField(upload_to="promo_banner")
-    active = models.BooleanField(default=True)
+    title = models.TextField(default="unknown")
+    link = models.URLField(blank=True, null=True)
+    show_after = models.IntegerField(default=30)
+    image = models.ImageField(upload_to="promo_banner", blank=True, null=True)
+    active = models.BooleanField(default=False)
+
+    @classmethod
+    def get(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj

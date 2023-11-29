@@ -17,6 +17,7 @@ urlpatterns = [
     path('', include('management.urls')),
     path('', include('dashboard.urls')),
     path('', include('mocktest.urls')),
+    path('', include('payment.urls')),
     path('user/role', GetRoleApi.as_view()),
     path('api/token/', obtain_auth_token),  # DRF token authentication
 ] + org_urls + sadmin_urls + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

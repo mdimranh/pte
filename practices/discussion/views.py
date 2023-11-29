@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from accounts.security.permission import (IsStudentPermission,
                                           IsStudentPermissionOrReadonly)
 
-from ..blank.models import Blank, RWBlank
+from ..blank.models import Blank, RWBlank, ReadingBlank
 from ..describe_image.models import DescribeImage
 from ..dictation.models import Dictation
 from ..highlight_incorrect_word.models import HighlightIncorrectWord
@@ -180,7 +180,8 @@ query = {
     "multi_choice_reading": lambda id: Discussion.objects.filter(parent__isnull=True, multi_choice_reading__id=id),
     "missing_word": lambda id: Discussion.objects.filter(parent__isnull=True, missing_word__id=id),
     "dictation": lambda id: Discussion.objects.filter(parent__isnull=True, dictation__id=id),
-    "blank": lambda id: Discussion.objects.filter(parent__isnull=True, blank__id=id),
+    "blank_listening": lambda id: Discussion.objects.filter(parent__isnull=True, blank__id=id),
+    "blank_reading": lambda id: Discussion.objects.filter(parent__isnull=True, blank_reading__id=id),
     "read_write_blank": lambda id: Discussion.objects.filter(parent__isnull=True, read_write_blank__id=id),
     "describe_image": lambda id: Discussion.objects.filter(parent__isnull=True, describe_image__id=id),
     "highlight_incorrect_word": lambda id: Discussion.objects.filter(parent__isnull=True,  highlight_incorrect_word__id=id),
@@ -228,6 +229,7 @@ _models = {
     "missing_word": MissingWord,
     "dictation": Dictation,
     "blank": Blank,
+    "blank_reading": ReadingBlank,
     "read_write_blank": RWBlank,
     "describe_image": DescribeImage,
     "highlight_incorrect_word": HighlightIncorrectWord,
@@ -238,7 +240,9 @@ _models = {
     "write_easy": WriteEasy
 }
 
+from rest_framework.parsers import MultiPartParser
 class DiscussionAdd(APIView):
+    parser_classes = [MultiPartParser]
     permission_classes = [IsStudentPermission]
     def post(self, request, *args, **kwargs):
         model = self.kwargs.get('model')

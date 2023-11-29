@@ -6,7 +6,7 @@ from rest_framework.generics import (CreateAPIView, DestroyAPIView,
                                      GenericAPIView, ListAPIView,
                                      ListCreateAPIView,
                                      RetrieveUpdateDestroyAPIView, RetrieveDestroyAPIView,
-                                     UpdateAPIView)
+                                     UpdateAPIView, RetrieveUpdateAPIView)
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,7 +15,7 @@ from .serializers import OrganizationDetailsSerializer
 
 from accounts.models import User
 from accounts.security.permission import IsSuperAdmin
-from practices.blank.models import Blank, RWBlank
+from practices.blank.models import Blank, RWBlank, ReadingBlank
 from practices.describe_image.models import DescribeImage
 from practices.dictation.models import Dictation
 from practices.discussion.models import Discussion
@@ -71,13 +71,26 @@ class TestStatisticsView(APIView):
             "read_aloud": ReadAloud.objects.all().count(),
             "missing_word": MissingWord.objects.all().count(),
             "summarize_written": Summarize.objects.all().count(),
+            "summarize_spoken": SummarizeSpoken.objects.all().count(),
             "dictation": Dictation.objects.all().count(),
             "highlight_summary": HighlightSummary.objects.all().count(),
             "multi_choice_multiple_answer": MultiChoice.objects.filter(single=False).count(),
             "multi_choice_single_answer": MultiChoice.objects.filter(single=True).count(),
+            "multi_choice_reading_multi_answer": MultiChoiceReading.objects.filter(single=False).count(),
+            "multi_choice_reading_single_answer": MultiChoiceReading.objects.filter(single=True).count(),
             "write_easy": WriteEasy.objects.all().count(),
             "repeat_sentence": RepeatSentence.objects.all().count(),
-            "retell_sentence": RetellSentence.objects.all().count()
+            "retell_sentence": RetellSentence.objects.all().count(),
+
+
+            "blank_listening": Blank.objects.all().count(),
+            "blank_reading": ReadingBlank.objects.all().count(),
+            "read_write_blank": RWBlank.objects.all().count(),
+
+            "describe_image": DescribeImage.objects.all().count(),
+            "highlight_incorrect_word": HighlightIncorrectWord.objects.all().count(),
+            "reorder_paragraph": ReorderParagraph.objects.all().count(),
+            "short_question": ShortQuestion.objects.all().count()
         }
         return JsonResponse(datas)
 
@@ -163,29 +176,54 @@ class OrganizationUpdateApiView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class OrgPasswordChange(APIView):
-    permission_classes = [IsAdminUser]
+    permission_classes=[IsAdminUser | IsSuperAdmin]
     def put(self, request, *args, **kwargs):
-        data = request.data
-        if "password" not in data:
+        data = dict(request.data)
+        serializer = ChangePasswordSerializer(data=data)
+        if serializer.is_valid():
+            if request.user.check_password(serializer.validated_data['my_password']):
+                organization = User.objects.get(id=serializer.validated_data['organization'].id)
+                organization.set_password(serializer.validated_data['new_password'])
+                return Response({
+                    "message": "Password changed successfully."
+                })
             return Response({
-                "password": "Pasword can't be null."
-            }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-        id = self.kwargs.get('id')
-        user = User.objects.filter(id=id, is_organization=True).first()
-        if user is None:
+                "my_password": ["Incorrect password."]
+            })
+        return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+class OrgUseridChange(APIView):
+    permission_classes=[IsAdminUser | IsSuperAdmin]
+    def put(self, request, *args, **kwargs):
+        data = dict(request.data)
+        serializer = ChangeUseridSerializer(data=data)
+        if serializer.is_valid():
+            if request.user.check_password(serializer.validated_data['my_password']):
+                organization = User.objects.get(id=serializer.validated_data['organization'].id)
+                organization.userid = serializer.validated_data['userid']
+                organization.save()
+                return Response({
+                    "message": "userid changed successfully."
+                })
             return Response({
-                "error": "Organization not found."
-            }, status=status.HTTP_404_NOT_FOUND)
-        user.set_password(data['password'])
-        user.save()
-        return Response({
-            "success": "Password have been changed successfully."
-        })
+                "my_password": ["Incorrect password."]
+            })
+        return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 class OrganizationListView(ListAPIView):
     permission_classes = (IsAdminUser,)
     serializer_class = OrganizationSerializer
     queryset = User.objects.filter(is_organization=True)
+    pagination_class = CustomPagination
+
+    def get_pagination_class(self):
+        if self.request.query_params.get('all') == 'true':
+            return None  # No pagination if ?all=true
+        return CustomPagination
+
+    def get(self, request, *args, **kwargs):
+        self.pagination_class = self.get_pagination_class()
+        return super().get(request, *args, **kwargs)
 
 class CouponListCreateAPIView(ListCreateAPIView):
     queryset = Coupon.objects.all()
@@ -212,6 +250,7 @@ class DiscussionCountView(APIView):
             "missing_word": Discussion.objects.filter(missing_word__id__isnull=False).count(),
             "dictation": Discussion.objects.filter(dictation__id__isnull=False).count(),
             "blank": Discussion.objects.filter(blank__id__isnull=False).count(),
+            "blank_reading": Discussion.objects.filter(blank_reading__id__isnull=False).count(),
             "read_write_blank": Discussion.objects.filter(read_write_blank__id__isnull=False).count(),
             "describe_image": Discussion.objects.filter(describe_image__id__isnull=False).count(),
             "highlight_incorrect_word": Discussion.objects.filter(highlight_incorrect_word__id__isnull=False).count(),
@@ -244,14 +283,14 @@ _models = {
 }
 
 class ModelWiseDiscussion(APIView):
-    # permission_classes = [IsSuperAdmin]
+    permission_classes = [IsSuperAdmin | IsAdminUser]
     def get(self, request, *args, **kwargs):
         model = self.kwargs.get('model')
         fields = ['id', 'title']
         _for = _models.get(model)
         if _for is None:
             raise Http404
-        datas = _for.objects.all()
+        datas = _for.objects.filter(discussion__isnull=False).distinct()
         serializer_class = DynamicSerializer(_for).generate(fields, _for, model)
         serializer = serializer_class(instance=datas, many=True)
         return Response(serializer.data)
@@ -266,3 +305,16 @@ class PromoBannerRUDView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser | IsSuperAdmin]
     serializer_class = PromoBannerSerializer
     queryset = PromoBanner.objects.all()
+
+class PromoBannerRetriveUpdateView(RetrieveUpdateAPIView):
+    serializer_class = PromoBannerSerializer
+    permission_classes = []
+    
+    def get_object(self):
+        return PromoBanner.get()
+
+    def get_permissions(self):
+        if self.request.method in ['PUT', 'PATCH']:
+            return [IsSuperAdmin(), IsAdminUser()]
+        return super(PromoBannerRetriveUpdateView, self).get_permissions()
+            # return [permission() for permission in self.permission_classes]

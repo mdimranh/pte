@@ -17,5 +17,7 @@ urlpatterns = [
     path('', include('practices.describe_image.urls')),
     path('', include('practices.reorder_paragraph.urls')),
     path('', include('practices.blank.urls')),
+    path('', include('practices.highlight_incorrect_word.urls')),
     path('audio_to_text', AudioToText.as_view()),
+    path('<model>/<int:id>/delete', PracticeDestroyView.as_view()),
 ]

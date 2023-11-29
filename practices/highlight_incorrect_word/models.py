@@ -26,7 +26,7 @@ schema = {
 
 class HighlightIncorrectWord(models.Model):
     title = models.TextField(unique=True)
-    audio = models.FileField(upload_to="media/missing_word/%Y/%m/%d/")
+    audio = models.FileField(upload_to="media/highlight_incorrect/%Y/%m/%d/")
     options = jsonField(schema=schema, validators=[JsonValidator])
     right_options = ArrayField(models.TextField())
     bookmark = models.ManyToManyField(User, blank=True, related_name='hiw_bookmark')
