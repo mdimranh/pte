@@ -184,6 +184,7 @@ class OrgPasswordChange(APIView):
             if request.user.check_password(serializer.validated_data['my_password']):
                 organization = User.objects.get(id=serializer.validated_data['organization'].id)
                 organization.set_password(serializer.validated_data['new_password'])
+                organization.save()
                 return Response({
                     "message": "Password changed successfully."
                 })

@@ -110,6 +110,7 @@ class ChangePassword(APIView):
             if request.user.check_password(serializer.validated_data['my_password']):
                 student = User.objects.get(id=serializer.validated_data['student'].id)
                 student.set_password(serializer.validated_data['new_password'])
+                student.save()
                 return Response({
                     "message": "Password changed successfully."
                 })
