@@ -32,6 +32,8 @@ from practices.summarize.models import Summarize, SummarizeSpoken
 from practices.write_easy.models import WriteEasy
 from utils.pagination import CustomPagination
 
+from management.models import Profile
+
 from .models import Coupon, StudyMaterial
 from .serializers import *
 
@@ -144,6 +146,17 @@ class StudyMaterialDestroyAPIView(DestroyAPIView):
     serializer_class = StudyMaterialSerializer
 
 
+class StudyMaterialCount(APIView):
+    permission_classes = [IsAdminUser | IsSuperAdmin]
+    def get(self, request, *args, **kwargs):
+        data = {
+            "prediction": StudyMaterial.objects.filter(category="prediction").count(),
+            "template": StudyMaterial.objects.filter(category="template").count(),
+            "study_material": StudyMaterial.objects.filter(category="study_material").count()
+        }
+        return Response(data)
+
+
 class OrgRegistrationView(GenericAPIView):
     serializer_class = CreateOrganizationSerializer
     permission_classes = (IsAdminUser,)
@@ -190,9 +203,9 @@ class OrgPasswordChange(APIView):
                 })
             return Response({
                 "my_password": ["Incorrect password."]
-            })
+            }, status=status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-        
+
 
 class OrgUseridChange(APIView):
     permission_classes=[IsAdminUser | IsSuperAdmin]
@@ -201,15 +214,16 @@ class OrgUseridChange(APIView):
         serializer = ChangeUseridSerializer(data=data)
         if serializer.is_valid():
             if request.user.check_password(serializer.validated_data['my_password']):
-                organization = User.objects.get(id=serializer.validated_data['organization'].id)
-                organization.userid = serializer.validated_data['userid']
-                organization.save()
+                # organization = User.objects.get(id=serializer.validated_data['organization'].id)
+                profile = Profile.objects.get(user__id=serializer.validated_data['organization'].id)
+                profile.userid = serializer.validated_data['userid']
+                profile.save()
                 return Response({
                     "message": "userid changed successfully."
                 })
             return Response({
                 "my_password": ["Incorrect password."]
-            })
+            }, status=status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 class OrganizationListView(ListAPIView):

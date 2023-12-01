@@ -1,6 +1,10 @@
 from rest_framework import generics
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from .models import *
 from .serializers import *
+from rest_framework.permissions import IsAdminUser
+from accounts.security.permission import IsSuperAdmin
 
 class WrittingMocktestView(generics.CreateAPIView):
     queryset = WrittingMocktest.objects.all()
@@ -79,3 +83,16 @@ class FullMocktestUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "id"
     serializer_class = FullMocktestSerializer
     queryset = FullMocktest.objects.all()
+
+
+class MocktestCount(APIView):
+    permission_classes = [IsAdminUser | IsSuperAdmin]
+    def get(self, request, *args, **kwargs):
+        data = {
+            "full": FullMocktest.objects.all().count(),
+            "reading": ReadingMocktest.objects.all().count(),
+            "writting": WrittingMocktest.objects.all().count(),
+            "speaking": SpeakingMocktest.objects.all().count(),
+            "listening": ListeningMocktest.objects.all().count()
+        }
+        return Response(data)

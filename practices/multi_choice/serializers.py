@@ -11,6 +11,7 @@ class MultiChoiceSerializer(serializers.ModelSerializer):
             if len(attrs.get('right_options')) != 1:
                 raise serializers.ValidationError({"right_options": ["right_options length must be 1"]})
         options, right_options = attrs.get('options'), attrs.get('right_options')
+        available_options = [option.get('value') for option in options]
         if options is not None and right_options is not None:
             for roption in right_options:
                 found = False

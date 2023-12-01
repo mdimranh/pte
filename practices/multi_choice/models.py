@@ -24,6 +24,13 @@ schema = {
     },
 }
 
+list_schema = {
+    "type": "list",
+    "properties": {
+        "type": "string"
+    }
+}
+
 class MultiChoice(models.Model):
     title = models.TextField(unique=True)
     audio = models.FileField(upload_to="media/multi_choice/%Y/%m/%d/")

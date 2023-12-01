@@ -6,9 +6,9 @@ from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from rest_framework.permissions import IsAdminUser
 from accounts.security.permission import (IsStudentPermission,
-                                          IsStudentPermissionOrReadonly)
+                                          IsStudentPermissionOrReadonly, IsSuperAdmin)
 
 from ..blank.models import Blank, RWBlank, ReadingBlank
 from ..describe_image.models import DescribeImage
@@ -172,24 +172,24 @@ class RWBlankDiscussionListView(ListAPIView):
         return Discussion.objects.filter(parent__isnull=True, read_write_blank__id=rwblank_id)
 
 query = {
-    "read_aloud": lambda id: Discussion.objects.filter(parent__isnull=True, read_aloud__id=id),
-    "highlight_summary": lambda id: Discussion.objects.filter(parent__isnull=True, highlight_summary__id=id),
-    "summarize": lambda id: Discussion.objects.filter(parent__isnull=True, summarize__id=id),
-    "summarize_spoken": lambda id: Discussion.objects.filter(parent__isnull=True, summarize_spoken__id=id),
-    "multi_choice": lambda id: Discussion.objects.filter(parent__isnull=True, multi_choice__id=id),
-    "multi_choice_reading": lambda id: Discussion.objects.filter(parent__isnull=True, multi_choice_reading__id=id),
-    "missing_word": lambda id: Discussion.objects.filter(parent__isnull=True, missing_word__id=id),
-    "dictation": lambda id: Discussion.objects.filter(parent__isnull=True, dictation__id=id),
-    "blank_listening": lambda id: Discussion.objects.filter(parent__isnull=True, blank__id=id),
-    "blank_reading": lambda id: Discussion.objects.filter(parent__isnull=True, blank_reading__id=id),
-    "read_write_blank": lambda id: Discussion.objects.filter(parent__isnull=True, read_write_blank__id=id),
-    "describe_image": lambda id: Discussion.objects.filter(parent__isnull=True, describe_image__id=id),
-    "highlight_incorrect_word": lambda id: Discussion.objects.filter(parent__isnull=True,  highlight_incorrect_word__id=id),
-    "reorder_paragraph": lambda id: Discussion.objects.filter(parent__isnull=True, reorder_paragraph__id=id),
-    "repeat_sentence": lambda id: Discussion.objects.filter(parent__isnull=True, repeat_sentence__id=id),
-    "retell_sentence": lambda id: Discussion.objects.filter(parent__isnull=True, retell_sentence__id=id),
-    "short_question": lambda id: Discussion.objects.filter(parent__isnull=True, short_question__id=id),
-    "write_easy": lambda id: Discussion.objects.filter(parent__isnull=True, write_easy__id=id)
+    "read_aloud": lambda id: Discussion.objects.filter(parent__isnull=True, read_aloud__id=id).order_by('id'),
+    "highlight_summary": lambda id: Discussion.objects.filter(parent__isnull=True, highlight_summary__id=id).order_by('id'),
+    "summarize": lambda id: Discussion.objects.filter(parent__isnull=True, summarize__id=id).order_by('id'),
+    "summarize_spoken": lambda id: Discussion.objects.filter(parent__isnull=True, summarize_spoken__id=id).order_by('id'),
+    "multi_choice": lambda id: Discussion.objects.filter(parent__isnull=True, multi_choice__id=id).order_by('id'),
+    "multi_choice_reading": lambda id: Discussion.objects.filter(parent__isnull=True, multi_choice_reading__id=id).order_by('id'),
+    "missing_word": lambda id: Discussion.objects.filter(parent__isnull=True, missing_word__id=id).order_by('id'),
+    "dictation": lambda id: Discussion.objects.filter(parent__isnull=True, dictation__id=id).order_by('id'),
+    "blank_listening": lambda id: Discussion.objects.filter(parent__isnull=True, blank__id=id).order_by('id'),
+    "blank_reading": lambda id: Discussion.objects.filter(parent__isnull=True, blank_reading__id=id).order_by('id'),
+    "read_write_blank": lambda id: Discussion.objects.filter(parent__isnull=True, read_write_blank__id=id).order_by('id'),
+    "describe_image": lambda id: Discussion.objects.filter(parent__isnull=True, describe_image__id=id).order_by('id'),
+    "highlight_incorrect_word": lambda id: Discussion.objects.filter(parent__isnull=True,  highlight_incorrect_word__id=id).order_by('id'),
+    "reorder_paragraph": lambda id: Discussion.objects.filter(parent__isnull=True, reorder_paragraph__id=id).order_by('id'),
+    "repeat_sentence": lambda id: Discussion.objects.filter(parent__isnull=True, repeat_sentence__id=id).order_by('id'),
+    "retell_sentence": lambda id: Discussion.objects.filter(parent__isnull=True, retell_sentence__id=id).order_by('id'),
+    "short_question": lambda id: Discussion.objects.filter(parent__isnull=True, short_question__id=id).order_by('id'),
+    "write_easy": lambda id: Discussion.objects.filter(parent__isnull=True, write_easy__id=id).order_by('id')
 }
 
 class DiscussionListView(ListAPIView):
@@ -258,7 +258,7 @@ class DiscussionAdd(APIView):
             return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 class LikeDiscussion(APIView):
-    permission_classes = [IsStudentPermission]
+    permission_classes = [IsStudentPermission | IsSuperAdmin | IsAdminUser]
     def get(self, request, id):
         discussion = Discussion.objects.filter(id=id).first()
         if discussion is None:

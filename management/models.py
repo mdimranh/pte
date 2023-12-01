@@ -48,6 +48,9 @@ class Profile(models.Model):
     country = models.CharField(max_length=50, blank=True, null=True)
     org_name = models.CharField(max_length=255, blank=True, null=True)
 
+    def __str__(self):
+        return self.user.email
+
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
     if created:

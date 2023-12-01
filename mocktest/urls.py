@@ -21,4 +21,6 @@ urlpatterns = [
     path("full_mocktest", FullMocktestView.as_view()),
     path("full_mocktests", FullMocktestListView.as_view()),
     path("full_mocktest/<int:id>", FullMocktestUpdateDeleteView.as_view()),
+
+    path("mocktest/count", MocktestCount.as_view())
 ]
