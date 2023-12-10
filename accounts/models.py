@@ -61,6 +61,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name=_('user')
         verbose_name_plural = ('users')
+        ordering = ["-id"]
 
     # def get_absolute_url(self):
     #     return "/users/%s/" % urlquote(self.email)
@@ -91,6 +92,9 @@ class SocialAccount(models.Model):
     uid = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-id"]
 
 
 @receiver(post_delete, sender=User)

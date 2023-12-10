@@ -6,7 +6,7 @@ from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Profile, Purchase
+from .models import Profile, Purchase, Plan
 from .serializers import PlanList, PlanSerializer
 
 
@@ -38,10 +38,9 @@ class PlanView(APIView):
             return Response(serializer.data)
         return Response(serializer.data)
 
-# class PlanList(ListAPIView):
-#     serializer_class = PlanList
-#     def get_queryset(self):
-#         pk = self.kwargs.get('pk')
-#         queryset = Answer.objects.filter(summarize=pk)
-#         return queryset
+class PlanList(ListAPIView):
+    serializer_class = PlanList
+    def get_queryset(self):
+        queryset = Plan.objects.filter(start_date__lte = timezone.now(), end_date__gte = timezone.now())
+        return queryset
     

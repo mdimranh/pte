@@ -10,3 +10,6 @@ class RetellSentence(models.Model):
     bookmark = models.ManyToManyField(User, blank=True, related_name='retell_sentence_bookmark')
     prediction = models.BooleanField(default=False)
     appeared = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ["-id"]

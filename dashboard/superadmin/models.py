@@ -7,15 +7,21 @@ STUDY_MATERIAL_CHOICES = (
     ("study_material", "Study Material")
 )
 
+class Topic(models.Model):
+    title = models.TextField(unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 class StudyMaterial(models.Model):
-    title = models.TextField()
+    title = models.TextField(unique=True)
     category = models.CharField(max_length=20, choices=STUDY_MATERIAL_CHOICES)
+    topic = models.ForeignKey(Topic, on_delete=models.SET_NULL, blank=True, null=True)
     file = models.FileField(upload_to="study_material/%Y/%m/%d/")
     premium = models.BooleanField(default=False)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ['title', 'category']
+        ordering = ["-id"]
 
 COUPON_TYPE = (
     ('fixed', 'Fixed'),
@@ -23,7 +29,7 @@ COUPON_TYPE = (
 )
 
 class Coupon(models.Model):
-    title = models.TextField()
+    title = models.TextField(unique=True)
     code = models.CharField(max_length=15)
     type = models.CharField(max_length=20, choices=COUPON_TYPE)
     amount = models.IntegerField()
@@ -31,6 +37,9 @@ class Coupon(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-id"]
 
 class PromoBanner(models.Model):
     title = models.TextField(default="unknown")

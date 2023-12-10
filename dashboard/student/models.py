@@ -7,6 +7,9 @@ class ExamCountdown(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     exam_date = models.DateTimeField()
 
+    class Meta:
+        ordering = ["-id"]
+
 class TargetScore(models.Model):
     # Define choices as tuples of (value, human-readable name)
     THIRTY_FIVE = 35
@@ -23,3 +26,6 @@ class TargetScore(models.Model):
 
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     score = models.IntegerField(choices=YOUR_CHOICES)
+
+    class Meta:
+        ordering = ["-id"]

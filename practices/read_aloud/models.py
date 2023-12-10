@@ -16,3 +16,6 @@ class ReadAloud(models.Model):
 
     def __str__(self):
         return self.title if len(self.title) < 25 else self.title[:25]+"..."
+
+    class Meta:
+        ordering = ["-id"]

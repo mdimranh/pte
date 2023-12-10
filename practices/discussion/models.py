@@ -63,3 +63,6 @@ class Discussion(models.Model):
     def __str__(self):
         return self.body if len(self.body) < 25 else self.body[:24]+"..."
 
+    class Meta:
+        ordering = ["-id"]
+

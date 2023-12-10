@@ -27,6 +27,9 @@ class Blank(models.Model):
     prediction = models.BooleanField(default=False)
     appeared = models.IntegerField(default=0)
 
+    class Meta:
+        ordering = ["-id"]
+
 
 schema = {
     "type" : "list",
@@ -56,6 +59,9 @@ class ReadingBlank(models.Model):
         for option in options:
             del option['answer']
         return options
+
+    class Meta:
+        ordering = ["-id"]
 
 rwb_schema = {
     "type" : "list",
@@ -90,4 +96,7 @@ class RWBlank(models.Model):
         for option in options:
             del option['answer']
         return options
+
+    class Meta:
+        ordering = ["-id"]
 

@@ -156,6 +156,16 @@ class StudyMaterialCount(APIView):
         }
         return Response(data)
 
+class TopicListCreateView(ListCreateAPIView):
+    permission_classes = [IsAdminUser | IsSuperAdmin]
+    serializer_class = TopicSerializer
+    queryset = Topic.objects.all()
+
+class TopicRUDView(RetrieveUpdateDestroyAPIView):
+    lookup_field = 'id'
+    permission_classes = [IsAdminUser | IsSuperAdmin]
+    serializer_class = TopicSerializer
+    queryset = Topic.objects.all()
 
 class OrgRegistrationView(GenericAPIView):
     serializer_class = CreateOrganizationSerializer

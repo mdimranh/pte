@@ -68,6 +68,9 @@ class Answer(models.Model):
     #         get_dictation = Dictation.objects.get(**getattr(self, 'dictation'))
     #         return get_score(get_dictation.content, self.answer)
 
+    class Meta:
+        ordering = ["-id"]
+
 @receiver(post_delete, sender=Answer)
 def delete_file(sender, instance, **kwargs):
     if instance.audio:

@@ -10,3 +10,6 @@ class RepeatSentence(models.Model):
     bookmark = models.ManyToManyField(User, blank=True, related_name='rs_bookmark')
     prediction = models.BooleanField(default=False)
     appeared = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ["-id"]

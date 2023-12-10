@@ -53,10 +53,32 @@ class AdminUserSerializer(serializers.ModelSerializer):
             return AdminProfileSerializer(instance=profile).data
         return {}
 
+class TopicSerializer(serializers.ModelSerializer):
+    file = serializers.SerializerMethodField()
+    class Meta:
+        model = Topic
+        fields = [
+            "id", "title", "file", "created_at"
+        ]
+
+    def get_file(self, obj):
+        file_number = StudyMaterial.objects.filter(topic__id = obj.id).count()
+        return file_number
+
+class TopicSerialize(serializers.ModelSerializer):
+    class Meta:
+        model = Topic
+        fields = [
+            "title"
+        ]
+
 class StudyMaterialSerializer(serializers.ModelSerializer):
+    topic = TopicSerialize()
     class Meta:
         model = StudyMaterial
         fields = '__all__'
+
+    # def get_topic(self, obj)
 
 class CreateOrganizationSerializer(serializers.Serializer):
     userid = serializers.CharField(required=True)

@@ -24,4 +24,7 @@ urlpatterns = [
     # path("promo_banner", PromoBannerView.as_view()),
     # path("promo_banner/<int:id>", PromoBannerRUDView.as_view()),
     path("promo_banner", PromoBannerRetriveUpdateView.as_view()),
+
+    path("topic", TopicListCreateView.as_view()),
+    path("topic/<int:id>", TopicRUDView.as_view()),
 ]

@@ -47,6 +47,9 @@ class MultiChoice(models.Model):
     def __str__(self):
         return self.title
 
+    class Meta:
+        ordering = ["-id"]
+
 
 class MultiChoiceReading(models.Model):
     title = models.TextField(unique=True)
@@ -63,3 +66,6 @@ class MultiChoiceReading(models.Model):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        ordering = ["-id"]

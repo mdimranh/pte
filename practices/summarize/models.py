@@ -25,3 +25,6 @@ class SummarizeSpoken(models.Model):
     prediction = models.BooleanField(default=False)
     appeared = models.IntegerField(default=0)
 
+    class Meta:
+        ordering = ["-id"]
+
