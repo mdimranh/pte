@@ -2,12 +2,15 @@ from django.db.models import (Count, ExpressionWrapper, F, OuterRef, Q,
                               Subquery, fields)
 from django.shortcuts import render
 from django.utils import timezone
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import status
 
-from .models import Profile, Purchase, Plan
-from .serializers import PlanList, PlanSerializer
+from rest_framework.permissions import IsAdminUser
+
+from .models import *
+from .serializers import *
 
 
 class PlanView(APIView):
@@ -43,4 +46,66 @@ class PlanList(ListAPIView):
     def get_queryset(self):
         queryset = Plan.objects.filter(start_date__lte = timezone.now(), end_date__gte = timezone.now())
         return queryset
+
+
+# class OrganizationPackageView(APIView):
+#     def post(self, request):
+#         data = request.data
+#         serializer = OrganizationPackageSerializer(data=data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+
+class OrganizationPackageListView(ListAPIView):
+    serializer_class = OrganizationPackageSerializer
+    queryset = OrganizationPackage.objects.all()
+
+class OrganizationPackageDetailsView(RetrieveAPIView):
+    lookup_field = 'id'
+    serializer_class = OrganizationPackageSerializer
+    queryset = OrganizationPackage.objects.all()
+
+class OrganizationPackageCreateView(CreateAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = OrganizationPackageSerializer
+    queryset = OrganizationPackage.objects.all()
+
+class OrganizationPackageUpdateView(UpdateAPIView):
+    lookup_field = 'id'
+    permission_classes = [IsAdminUser]
+    serializer_class = OrganizationPackageSerializer
+    queryset = OrganizationPackage.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return super().update(request, *args, **kwargs)
     
+
+
+
+
+class StudentPackageListView(ListAPIView):
+    serializer_class = StudentPackageSerializer
+    queryset = StudentPackage.objects.all()
+
+class StudentPackageDetailsView(RetrieveAPIView):
+    lookup_field = 'id'
+    serializer_class = StudentPackageSerializer
+    queryset = StudentPackage.objects.all()
+
+class StudentPackageCreateView(CreateAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = StudentPackageSerializer
+    queryset = StudentPackage.objects.all()
+
+class StudentPackageUpdateView(UpdateAPIView):
+    lookup_field = 'id'
+    permission_classes = [IsAdminUser]
+    serializer_class = StudentPackageSerializer
+    queryset = StudentPackage.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return super().update(request, *args, **kwargs)

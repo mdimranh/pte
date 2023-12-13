@@ -5,6 +5,10 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from accounts.models import User
 
+from django.contrib.postgres.fields import ArrayField
+from utils.fields import jsonField
+from utils.validators import JsonValidator
+
 from dashboard.superadmin.models import Coupon
 from payment.models import Payment
 
@@ -20,8 +24,52 @@ class Plan(models.Model):
     class Meta:
         ordering = ["-id"]
 
+
+schema = {
+    "type" : "list",
+    "properties" : {
+        "id": {
+            "type": "number"
+        },
+        "title": {
+            "type": "string"
+        },
+        "saving": {
+            "type": "string"
+        },
+        "cost": {
+            "type": "string"
+        },
+        "quantity": {
+            "type": "string"
+        },
+        "type": "object"
+    },
+}
+
+class OrganizationPackage(models.Model):
+    title = models.TextField(unique=True)
+    validity = models.IntegerField()
+    premium_practice_access = models.BooleanField()
+    mocktest_access = models.BooleanField()
+    validation = jsonField(schema=schema, validators=[JsonValidator])
+    thumbnail = models.ImageField(upload_to="media/package/%Y/%m/%d/")
+
+class StudentPackage(models.Model):
+    title = models.TextField(unique=True)
+    validity = models.IntegerField()
+    premium_practice_access = models.BooleanField()
+    mocktest_access = models.BooleanField()
+    cost = models.IntegerField()
+    pre_price = models.IntegerField()
+    text = ArrayField(models.TextField(), blank=True, null=True)
+    thumbnail = models.ImageField(upload_to="media/package/%Y/%m/%d/")
+
 class Purchase(models.Model):
     plan = models.ForeignKey(Plan, on_delete=models.SET_NULL, blank=True, null=True)
+    org_package = models.ForeignKey(OrganizationPackage, on_delete=models.SET_NULL, blank=True, null=True)
+    validation_id = models.IntegerField(blank=True, null=True)
+    student_package = models.ForeignKey(StudentPackage, on_delete=models.SET_NULL, blank=True, null=True)
     organization = models.ForeignKey(User, on_delete=models.CASCADE, related_name="organization")
     student = models.ManyToManyField(User, related_name="plan")
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, blank=True, null=True)

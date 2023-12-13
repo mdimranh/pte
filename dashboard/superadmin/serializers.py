@@ -72,8 +72,14 @@ class TopicSerialize(serializers.ModelSerializer):
             "title"
         ]
 
-class StudyMaterialSerializer(serializers.ModelSerializer):
+class StudyMaterialListSerializer(serializers.ModelSerializer):
     topic = TopicSerialize()
+    class Meta:
+        model = StudyMaterial
+        fields = '__all__'
+
+class StudyMaterialSerializer(serializers.ModelSerializer):
+    # topic = TopicSerialize()
     class Meta:
         model = StudyMaterial
         fields = '__all__'

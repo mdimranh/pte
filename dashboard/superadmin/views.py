@@ -104,7 +104,7 @@ class StudyMaterialCreateAPIView(CreateAPIView):
 
 class StudyMaterialListAPIView(ListAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = StudyMaterialSerializer
+    serializer_class = StudyMaterialListSerializer
     pagination_class = CustomPagination
 
     def get_queryset(self):
@@ -160,6 +160,7 @@ class TopicListCreateView(ListCreateAPIView):
     permission_classes = [IsAdminUser | IsSuperAdmin]
     serializer_class = TopicSerializer
     queryset = Topic.objects.all()
+    pagination_class = CustomPagination
 
 class TopicRUDView(RetrieveUpdateDestroyAPIView):
     lookup_field = 'id'

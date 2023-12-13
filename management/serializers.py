@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from accounts.serializers import UserDetailsSerializer
 
-from .models import Plan, Purchase
+from .models import Plan, Purchase, OrganizationPackage, StudentPackage
 
 
 class PlanDetailsSerializer(serializers.ModelSerializer):
@@ -24,4 +24,15 @@ class PlanSerializer(serializers.ModelSerializer):
 class PlanList(serializers.ModelSerializer):
     class Meta:
         model = Plan
+        fields = '__all__'
+
+
+class OrganizationPackageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrganizationPackage
+        fields = '__all__'
+
+class StudentPackageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentPackage
         fields = '__all__'

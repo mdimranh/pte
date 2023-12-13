@@ -1,6 +1,9 @@
 from rest_framework import serializers
-from management.models import Plan
+from management.models import OrganizationPackage, StudentPackage
 
-class PaymentSerializer(serializers.Serializer):
-    coupon_code = serializers.CharField(max_length=20)
-    plan = serializers.ModelField(model_field=Plan)
+class OrgPaymentSerializer(serializers.Serializer):
+    package = serializers.PrimaryKeyRelatedField(queryset=OrganizationPackage.objects.all())
+    validation = serializers.IntegerField()
+
+class StudentPaymentSerializer(serializers.Serializer):
+    package = serializers.ModelField(model_field=StudentPackage)
