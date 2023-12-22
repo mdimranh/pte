@@ -25,26 +25,26 @@ class Plan(models.Model):
         ordering = ["-id"]
 
 
-schema = {
-    "type" : "list",
-    "properties" : {
-        "id": {
-            "type": "number"
-        },
-        "title": {
-            "type": "string"
-        },
-        "saving": {
-            "type": "string"
-        },
-        "cost": {
-            "type": "string"
-        },
-        "quantity": {
-            "type": "string"
-        },
-        "type": "object"
+validation_schema = {
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string"
+      },
+      "saving": {
+        "type": "integer"
+      },
+      "cost": {
+        "type": "integer"
+      },
+      "quantity": {
+        "type": "integer"
+      }
     },
+    "required": ["title", "saving", "cost", "quantity"]
+  }
 }
 
 class OrganizationPackage(models.Model):
@@ -52,7 +52,7 @@ class OrganizationPackage(models.Model):
     validity = models.IntegerField()
     premium_practice_access = models.BooleanField()
     mocktest_access = models.BooleanField()
-    validation = jsonField(schema=schema, validators=[JsonValidator])
+    validation = jsonField(schema=validation_schema, validators=[JsonValidator(schema=validation_schema)])
     thumbnail = models.ImageField(upload_to="media/package/%Y/%m/%d/")
 
 class StudentPackage(models.Model):

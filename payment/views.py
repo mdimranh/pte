@@ -15,7 +15,8 @@ from rest_framework import status
 
 from dashboard.superadmin.models import Coupon
 
-settings = { 'store_id': 'pte6564c943b9553', 'store_pass': 'pte6564c943b9553@ssl', 'issandbox': True }
+settings = { 'store_id': 'peterspte0live', 'store_pass': '656849153072868057', 'issandbox': False }
+# settings = { 'store_id': 'pte6564c943b9553', 'store_pass': 'pte6564c943b9553@ssl', 'issandbox': True }
 
 # class PaymentView(APIView):
 #     permission_classes = [IsStudentPermission, IsOrganizationPermission]
@@ -87,7 +88,7 @@ def payment_payload(request, price, purchase):
     post_body['emi_option'] = 0
     post_body['cus_name'] = request.user.full_name
     post_body['cus_email'] = request.user.email
-    post_body['cus_phone'] = "01700000000"
+    post_body['cus_phone'] = str(request.user.phone)
 
     profile = Profile.objects.filter(user=request.user).first()
 
@@ -98,8 +99,8 @@ def payment_payload(request, price, purchase):
     post_body['shipping_method'] = "NO"
     post_body['multi_card_name'] = ""
     post_body['num_of_item'] = 1
-    post_body['product_name'] = "Test"
-    post_body['product_category'] = "Test Category"
+    post_body['product_name'] = "Membership"
+    post_body['product_category'] = "Unknown"
     post_body['product_profile'] = "general"
     return post_body
 
@@ -132,10 +133,17 @@ class OrganizationPaymentView(APIView):
 
             payload = payment_payload(request, price, purchase)
 
+            # return Response(payload)
+
             response = sslcommez.createSession(payload)
-            return Response({
-                "redirect_url": response.get("redirectGatewayURL", "/")
-            })
+            redirect_url = response.get("redirectGatewayURL")
+            # return Response(response)
+            if redirect_url == "":
+                return Response(response, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+            else:
+                return Response({
+                    "redirect_url": response.get("redirectGatewayURL")
+                })
         return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 class StudentPaymentView(APIView):
@@ -181,18 +189,60 @@ def PaymentSuccess(request, uid, pid):
     purchase.payment = payment
     purchase.save()
 
-    return redirect(f"https://{get_current_site(request).domain}")
+    if user.is_organization:
+        package_id = purchase.org_package.id
+    else:
+        package_id = purchase.student_package.id
+
+    return redirect(f"https://www.codebyamirus.link/organization/billing-payment/checkout?id={package_id}&status=success")
 
 @csrf_exempt
 def PaymentCancel(request, pid):
     data = request.POST
     purchase = Purchase.objects.get(id=pid)
     purchase.delete()
-    return redirect(f"https://{get_current_site(request).domain}")
+    if purchase.org_package is not None:
+        pid = purchase.org_package.id
+    else:
+        pid = purchase.student_package.id
+    return redirect(f"https://www.codebyamirus.link/organization/billing-payment/checkout?id={pid}&status=cancel")
 
 @csrf_exempt
 def PaymentFail(request, pid):
     data = request.POST
     purchase = Purchase.objects.get(id=pid)
     purchase.delete()
-    return redirect(f"https://{get_current_site(request).domain}")
+    if purchase.org_package is not None:
+        pid = purchase.org_package.id
+    else:
+        pid = purchase.student_package.id
+    return redirect(f"https://www.codebyamirus.link/organization/billing-payment/checkout?id={pid}&status=failed")
+
+
+
+class PaymentDetails(APIView):
+    # permission_classes = [IsAuth]
+    def get(self, request, id):
+        purchase = Purchase.objects.get(id=id)
+        if purchase.organization is not None:
+            package = ""
+            amount = 0
+            for pack in purchase.org_package.validation:
+                if pack['id'] == purchase.validation_id:
+                    package = pack['title']
+                    amount = pack['cost']
+            profile = Profile.objects.get(user__id = purchase.organization.id)
+            data = {
+                "order_details": {
+                    "id": purchase.id,
+                    "title": purchase.org_package.title,
+                    "package": package,
+                    "amount": amount
+                },
+                "billing_address": {
+                    "name": purchase.organization.full_name,
+                    "email": purchase.organization.email,
+                    "address": profile.address
+                }
+            }
+            return Response(data)

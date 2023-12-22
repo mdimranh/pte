@@ -213,7 +213,7 @@ class PromoBannerSerializer(serializers.ModelSerializer):
 class ProfileDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ['org_name', 'country']
+        fields = ['org_name', 'country', 'address']
 
 class PurchaseSerializer(serializers.ModelSerializer):
     class Meta:

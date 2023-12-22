@@ -129,6 +129,7 @@ class GroupListView(ListAPIView):
 class OrgGroupListView(ListAPIView):
     serializer_class = GroupSerializer
     permission_classes = [IsAdminUser]
+    pagination_class = CustomPagination
     def get_queryset(self):
         oid = self.kwargs.get("oid") 
         queryset = Group.objects.filter(organization__id=oid)
@@ -197,5 +198,4 @@ class RecentJoinedStudentList(ListAPIView):
         elif self.request.user.is_admin or self.request.user.is_staff: 
             queryset = User.objects.filter(is_student=True, date_joined__gte=timezone.now() - timedelta(days=30))
         return queryset
-    
     

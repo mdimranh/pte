@@ -8,19 +8,18 @@ from jsonschema import validate
 
 @deconstructible
 class JsonValidator:
-    schema = {}
+    # schema = {}
     message = _("Enter a valid value.")
     code = "invalid"
     inverse_match = False
 
     def __init__(
-        self, schema={}, message=None, code=None, inverse_match=None, flags=None
+        self, schema=None, message=None, code=None, inverse_match=None, flags=None
     ):
-        if schema is not None:
-            self.schema = schema
+        self.schema = schema
 
     def __call__(self, value):
         try:
-            validate(instance=value, schema=schema)
+            validate(instance=value, schema=self.schema)
         except:
             raise ValidationError("Invalid data.")

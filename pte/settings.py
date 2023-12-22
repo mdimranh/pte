@@ -17,6 +17,9 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = ['https://api.codebyamirus.link']
 
+from import_export.formats.base_formats import JSON
+EXPORT_FORMATS = [JSON]
+
 
 # Application definition
 
@@ -69,6 +72,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     "phonenumber_field", # docs: https://django-phonenumber-field.readthedocs.io/en/latest/
+    'import_export',
 
     'accounts',
 ]

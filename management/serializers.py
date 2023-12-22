@@ -32,6 +32,16 @@ class OrganizationPackageSerializer(serializers.ModelSerializer):
         model = OrganizationPackage
         fields = '__all__'
 
+    def save(self, **kwargs):
+        validated_data = self.validated_data
+        if "validation" in validated_data:
+            i = 1
+            for item in validated_data['validation']:
+                item['id'] = i
+                i+=1
+        instance = super(OrganizationPackageSerializer, self).save(**validated_data, **kwargs)
+        return instance
+
 class StudentPackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentPackage

@@ -23,7 +23,7 @@ class CustomPagination(PageNumberPagination):
 
         return Response({
             'total': total,
-            'start_index': start_index,
+            'start_index': start_index if total > 0 else 0,
             'end_index': end_index,
             'links': links,
             'next': bool(next_page_number),

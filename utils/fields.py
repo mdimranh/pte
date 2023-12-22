@@ -5,7 +5,7 @@ class jsonField(models.JSONField):
     def __init__(
         self,
         *args,
-        schema={},
+        schema=None,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
